@@ -1,3 +1,4 @@
+use gt_tools::ReleaseInfo;
 
 use reqwest::Error;
 use reqwest::header::{
@@ -19,7 +20,7 @@ async fn main() -> Result<(), Error> {
         .header(ACCEPT, "application/json")
         .send()
         .await?;
-    let body_text: String = response.text().await?;
+    let body_text: Vec<ReleaseInfo> = response.json().await?;
 
     println!("{:?}", body_text);
     Ok(())
