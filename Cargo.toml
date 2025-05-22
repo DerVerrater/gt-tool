@@ -1,0 +1,20 @@
+[package]
+name = "gt-tools"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+clap = "4.0.32"
+reqwest = { version = "0.11.13", features = ["json"] }
+serde = "1.0.152"
+tokio = { version = "1.24.2", features = ["macros", "rt-multi-thread"] }
+
+# Packages available in Debian (Sid)
+# clap = "4.5.23"
+# reqwest = "0.12.15"
+# tokio = "1.43.1"
+
+# Debian (Bookworm)
+# clap = "4.0.32"
+# reqwest = "0.11.13"
+# tokio = "1.24.2"
