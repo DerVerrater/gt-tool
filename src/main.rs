@@ -9,14 +9,14 @@ use reqwest::header::{ACCEPT, USER_AGENT};
 async fn main() -> Result<(), Error> {
     let args = Args::parse();
 
+    let request_url = format!(
+        "http://localhost:3000/api/v1/repos/{owner}/{repo}/releases",
+        owner = "robert",
+        repo = "rcalc",
+    );
+    let client = reqwest::Client::new();
     match args.command {
         gt_tools::cli::Commands::ListReleases => {
-            let request_url = format!(
-                "http:/localhost:3000/api/v1/repos/{owner}/{repo}/releases",
-                owner = "robert",
-                repo = "rcalc",
-            );
-            let client = reqwest::Client::new();
             let response = client
                 .get(request_url)
                 .header(USER_AGENT, "gt-tools-test-agent")
