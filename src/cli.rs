@@ -14,8 +14,5 @@ pub struct Args {
 
 #[derive(Subcommand, Debug)]
 pub enum Commands {
-    ListReleases {
-        #[arg(short, long)]
-        list: bool,
-    },
+    ListReleases,
 }

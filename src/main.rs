@@ -10,7 +10,7 @@ async fn main() -> Result<(), Error> {
     let args = Args::parse();
 
     match args.command {
-        gt_tools::cli::Commands::ListReleases { list } => {
+        gt_tools::cli::Commands::ListReleases => {
             let request_url = format!(
                 "http:/localhost:3000/api/v1/repos/{owner}/{repo}/releases",
                 owner = "robert",
