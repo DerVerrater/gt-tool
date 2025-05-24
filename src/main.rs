@@ -27,15 +27,14 @@ async fn main() -> Result<(), Error> {
     let client = reqwest::Client::new();
     match args.command {
         gt_tools::cli::Commands::ListReleases => {
-            let response = client
-                .get(request_url)
-                .header(USER_AGENT, "gt-tools-test-agent")
-                .header(ACCEPT, "application/json")
-                .send()
-                .await?;
-            let body_text: Vec<ReleaseInfo> = response.json().await?;
-
-            println!("{:?}", body_text);
+            let releases = do_list_releases(
+                &client,
+                "robert",
+                "rcalc"
+            ).await?;
+            for release in releases {
+                println!("{:?}", release);
+            }
         }
         gt_tools::cli::Commands::CreateRelease { name } => {
             let submission = CreateReleaseOption {
@@ -51,6 +50,27 @@ async fn main() -> Result<(), Error> {
     }
 
     Ok(())
+}
+
+async fn do_list_releases(
+    client: &reqwest::Client,
+    owner: &str,
+    repo: &str
+) -> Result<Vec<ReleaseInfo>, Error> {
+    let request_url = format!(
+        "{hostname}{front}{owner}{repo}{back}",
+        hostname = API_HOSTNAME,
+        front = API_RELEASE_FRONT,
+        back = API_RELEASE_BACK
+    );
+    let response = client
+        .get(request_url)
+        .header(USER_AGENT, "gt-tools-test-agent")
+        .header(ACCEPT, "application/json")
+        .send()
+        .await?;
+    let body_text: Vec<ReleaseInfo> = response.json().await?;
+    return Ok(body_text);
 }
 
 #[must_use]
