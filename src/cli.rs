@@ -17,6 +17,16 @@ pub enum Commands {
     ListReleases,
     CreateRelease {
         #[arg()]
+        body: String,
+        #[arg(short, long, default_value_t = false)]
+        draft: bool,
+        #[arg()]
         name: String,
+        #[arg(short, long)]
+        prerelease: bool,
+        #[arg()]
+        tag_name: String,
+        #[arg()]
+        target_commitish: String,
     },
 }
