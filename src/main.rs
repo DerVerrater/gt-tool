@@ -8,14 +8,21 @@ use clap::Parser;
 use reqwest::Error;
 use reqwest::header::{ACCEPT, USER_AGENT};
 
+const API_HOSTNAME: &'static str = "http://localhost:3000";
+const API_RELEASE_FRONT: &'static str = "/api/v1/repos/";
+const API_RELEASE_BACK: &'static str = "/releases";
+
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     let args = Args::parse();
 
     let request_url = format!(
-        "http://localhost:3000/api/v1/repos/{owner}/{repo}/releases",
+        "{hostname}{front}{owner}{repo}{back}",
+        hostname = API_HOSTNAME,
+        front = API_RELEASE_FRONT,
         owner = "robert",
         repo = "rcalc",
+        back = API_RELEASE_BACK
     );
     let client = reqwest::Client::new();
     match args.command {
