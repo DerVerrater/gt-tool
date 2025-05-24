@@ -7,7 +7,7 @@ pub fn module_echo() {
 }
 
 /// A struct matching a Gitea "Release" entry
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Serialize)]
 pub struct ReleaseInfo {
     id: usize,
     tag_name: String,
@@ -26,7 +26,7 @@ pub struct ReleaseInfo {
     author: Author,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Serialize)]
 pub struct Author {
     id: usize,
     login: String,
@@ -50,11 +50,25 @@ impl CreateReleaseOption {
     pub fn new(name: String) -> Self {
         Self{
             body: String::from("hard-coded test body"),
-            draft: true,
+            draft: false,
             name,
             prerelease: true,
-            tag_name: String::from("hard-coded-test"),
-            target_commitish: String::from("3171c892480c46976106fa465d04fdb7e734dd53")
+            tag_name: String::from("big-goof"),
+            target_commitish: String::from("548ceecc7528901a7b4376091b42e410d950affc")
         }
     }
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct ApiError {
+    message: String,
+    url: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(untagged)]
+pub enum CreateResult {
+    Success(ReleaseInfo),
+    ErrWithMessage(ApiError),
+    Empty
 }
