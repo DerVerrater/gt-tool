@@ -18,23 +18,26 @@ async fn main() -> Result<(), Error> {
     let client = reqwest::Client::new();
     match args.command {
         gt_tools::cli::Commands::ListReleases => {
-            let releases = do_list_releases(
-                &client,
-                "robert",
-                "rcalc"
-            ).await?;
+            let releases = do_list_releases(&client, "robert", "rcalc").await?;
             for release in releases {
                 println!("{:?}", release);
             }
         }
-        gt_tools::cli::Commands::CreateRelease { name } => {
+        gt_tools::cli::Commands::CreateRelease {
+            name,
+            body,
+            draft,
+            prerelease,
+            tag_name,
+            target_commitish,
+        } => {
             let submission = CreateReleaseOption {
-                body: String::from("hard-coded test body"),
-                draft: false,
+                body,
+                draft,
                 name,
-                prerelease: true,
-                tag_name: String::from("big-goof"),
-                target_commitish: String::from("548ceecc7528901a7b4376091b42e410d950affc"),
+                prerelease,
+                tag_name,
+                target_commitish,
             };
             do_create_release(&client, submission).await?;
         }
@@ -46,7 +49,7 @@ async fn main() -> Result<(), Error> {
 async fn do_list_releases(
     client: &reqwest::Client,
     owner: &str,
-    repo: &str
+    repo: &str,
 ) -> Result<Vec<ReleaseInfo>, Error> {
     let request_url = format!(
         "{hostname}{front}{owner}/{repo}{back}",
