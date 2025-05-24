@@ -49,7 +49,7 @@ async fn do_list_releases(
     repo: &str
 ) -> Result<Vec<ReleaseInfo>, Error> {
     let request_url = format!(
-        "{hostname}{front}{owner}{repo}{back}",
+        "{hostname}{front}{owner}/{repo}{back}",
         hostname = API_HOSTNAME,
         front = API_RELEASE_FRONT,
         back = API_RELEASE_BACK
@@ -76,7 +76,7 @@ async fn do_create_release(
         "You must set the RELEASE_KEY_GITEA environment variable so the Gitea API can be used.",
     );
     let request_url = format!(
-        "{hostname}{front}{owner}{repo}{back}",
+        "{hostname}{front}{owner}/{repo}{back}",
         hostname = API_HOSTNAME,
         front = API_RELEASE_FRONT,
         owner = "robert",
