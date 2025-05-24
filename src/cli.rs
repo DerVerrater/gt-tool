@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 
-#[derive(Parser, Debug)]
+#[derive(Debug, Parser)]
 #[command(version, about, long_about = None)]
 pub struct Args {
     #[arg(short = 'o', long = "owner")]
@@ -12,7 +12,7 @@ pub struct Args {
     pub command: Commands,
 }
 
-#[derive(Subcommand, Debug)]
+#[derive(Debug, Subcommand)]
 pub enum Commands {
     ListReleases,
     CreateRelease {

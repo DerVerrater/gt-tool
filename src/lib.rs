@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 pub mod cli;
 
 /// A struct matching a Gitea "Release" entry
-#[derive(Deserialize, Debug, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct ReleaseInfo {
     id: usize,
     tag_name: String,
@@ -22,7 +22,7 @@ pub struct ReleaseInfo {
     author: Author,
 }
 
-#[derive(Deserialize, Debug, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Author {
     id: usize,
     login: String,
@@ -32,7 +32,7 @@ pub struct Author {
     email: String,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Debug, Serialize)]
 pub struct CreateReleaseOption {
     pub body: String,
     pub draft: bool,
