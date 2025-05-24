@@ -1,5 +1,6 @@
 use gt_tools::CreateReleaseOption;
 use gt_tools::{ReleaseInfo, cli::Args};
+use serde::{Deserialize, Serialize};
 
 use std::env;
 
@@ -43,7 +44,8 @@ async fn main() -> Result<(), Error> {
                 .send()
                 .await?;
 
-            println!("{:?}", response.text().await?);
+            let result: gt_tools::CreateResult = response.json().await?;
+            println!("{:?}", result);
         }
     }
 
