@@ -3,6 +3,7 @@ use gt_tools::{ReleaseInfo, cli::Args};
 use serde::{Deserialize, Serialize};
 
 use std::env;
+use std::io::Read;
 
 use clap::Parser;
 
@@ -32,22 +33,41 @@ async fn main() -> Result<(), Error> {
             println!("{:?}", body_text);
         }
         gt_tools::cli::Commands::CreateRelease { name } => {
-            let token = env::var("RELEASE_KEY_GITEA")
-                .expect("You must set the RELEASE_KEY_GITEA environment variable so the Gitea API can be used.");
-            let body = CreateReleaseOption::new(name);
-            let response = client
-                .post(request_url)
-                .header(USER_AGENT, "gt-tools-test-agent")
-                .header(ACCEPT, "application/json")
-                .header("Authorization", format!("token {}", token))
-                .json(&body)
-                .send()
-                .await?;
-
-            let result: gt_tools::CreateResult = response.json().await?;
-            println!("{:?}", result);
+            let submission = CreateReleaseOption {
+                body: String::from("hard-coded test body"),
+                draft: false,
+                name,
+                prerelease: true,
+                tag_name: String::from("big-goof"),
+                target_commitish: String::from("548ceecc7528901a7b4376091b42e410d950affc"),
+            };
+            do_create_release(&client, &request_url, submission).await?;
         }
     }
 
+    Ok(())
+}
+
+#[must_use]
+async fn do_create_release(
+    client: &reqwest::Client,
+    endpoint: &str,
+    submission: CreateReleaseOption,
+) -> Result<(), Error> {
+    let token = env::var("RELEASE_KEY_GITEA").expect(
+        "You must set the RELEASE_KEY_GITEA environment variable so the Gitea API can be used.",
+    );
+    let response = client
+        .post(endpoint)
+        .header(USER_AGENT, "gt-tools-test-agent")
+        .header(ACCEPT, "application/json")
+        .header("Authorization", format!("token {}", token))
+        .json(&submission)
+        .send()
+        .await?;
+
+    println!("HTTP Response: {}", response.status());
+    let result: gt_tools::CreateResult = response.json().await?;
+    println!("{:?}", result);
     Ok(())
 }

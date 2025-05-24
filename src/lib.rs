@@ -38,25 +38,12 @@ pub struct Author {
 
 #[derive(Serialize, Debug)]
 pub struct CreateReleaseOption {
-    body: String,
-    draft: bool,
-    name: String,
-    prerelease: bool,
-    tag_name: String,
-    target_commitish: String,
-}
-
-impl CreateReleaseOption {
-    pub fn new(name: String) -> Self {
-        Self{
-            body: String::from("hard-coded test body"),
-            draft: false,
-            name,
-            prerelease: true,
-            tag_name: String::from("big-goof"),
-            target_commitish: String::from("548ceecc7528901a7b4376091b42e410d950affc")
-        }
-    }
+    pub body: String,
+    pub draft: bool,
+    pub name: String,
+    pub prerelease: bool,
+    pub tag_name: String,
+    pub target_commitish: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
