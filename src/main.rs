@@ -60,6 +60,9 @@ async fn do_list_releases(
         .header(ACCEPT, "application/json")
         .send()
         .await?;
+    // TODO: Handle case with no releases.
+    // afaict: Serde tries to unpack an empty list, can't decide what struct it's unpacking,
+    // and emits an error. Desired behavior: empty Vec.
     let body_text: Vec<ReleaseInfo> = response.json().await?;
     return Ok(body_text);
 }
