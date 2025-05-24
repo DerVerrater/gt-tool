@@ -1,23 +1,20 @@
-use clap::{
-    Parser,
-    Subcommand
-};
+use clap::{Parser, Subcommand};
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 pub struct Args {
     #[arg(short = 'o', long = "owner")]
-    repo_owner: Option<String>,
+    pub repo_owner: Option<String>,
     #[arg(short = 'n', long = "repo_name")]
-    repo_name: Option<String>,
+    pub repo_name: Option<String>,
 
     #[command(subcommand)]
-    command: Option<Commands>
+    pub command: Commands,
 }
 
 #[derive(Subcommand, Debug)]
-enum Commands {
-    ListReleases{
+pub enum Commands {
+    ListReleases {
         #[arg(short, long)]
         list: bool,
     },

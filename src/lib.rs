@@ -2,7 +2,7 @@ use serde::Deserialize;
 
 pub mod cli;
 
-pub fn module_echo(){
+pub fn module_echo() {
     println!("hello from lib.rs!");
 }
 
@@ -23,7 +23,7 @@ pub struct ReleaseInfo {
     prerelease: bool,
     created_at: String,
     published_at: String,
-    author: Author
+    author: Author,
 }
 
 #[derive(Deserialize, Debug)]
@@ -33,5 +33,5 @@ pub struct Author {
     login_name: String,
     source_id: usize,
     full_name: String,
-    email: String
+    email: String,
 }
