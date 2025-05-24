@@ -1,4 +1,4 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 pub mod cli;
 
@@ -34,4 +34,27 @@ pub struct Author {
     source_id: usize,
     full_name: String,
     email: String,
+}
+
+#[derive(Serialize, Debug)]
+pub struct CreateReleaseOption {
+    body: String,
+    draft: bool,
+    name: String,
+    prerelease: bool,
+    tag_name: String,
+    target_commitish: String,
+}
+
+impl CreateReleaseOption {
+    pub fn new(name: String) -> Self {
+        Self{
+            body: String::from("hard-coded test body"),
+            draft: true,
+            name,
+            prerelease: true,
+            tag_name: String::from("hard-coded-test"),
+            target_commitish: String::from("3171c892480c46976106fa465d04fdb7e734dd53")
+        }
+    }
 }

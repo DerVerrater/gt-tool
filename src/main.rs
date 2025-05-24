@@ -1,4 +1,7 @@
+use gt_tools::CreateReleaseOption;
 use gt_tools::{ReleaseInfo, cli::Args};
+
+use std::env;
 
 use clap::Parser;
 
@@ -26,6 +29,21 @@ async fn main() -> Result<(), Error> {
             let body_text: Vec<ReleaseInfo> = response.json().await?;
 
             println!("{:?}", body_text);
+        }
+        gt_tools::cli::Commands::CreateRelease { name } => {
+            let token = env::var("RELEASE_KEY_GITEA")
+                .expect("You must set the RELEASE_KEY_GITEA environment variable so the Gitea API can be used.");
+            let body = CreateReleaseOption::new(name);
+            let response = client
+                .post(request_url)
+                .header(USER_AGENT, "gt-tools-test-agent")
+                .header(ACCEPT, "application/json")
+                .header("Authorization", format!("token {}", token))
+                .json(&body)
+                .send()
+                .await?;
+
+            println!("{:?}", response.text().await?);
         }
     }
 

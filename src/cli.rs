@@ -15,4 +15,8 @@ pub struct Args {
 #[derive(Subcommand, Debug)]
 pub enum Commands {
     ListReleases,
+    CreateRelease {
+        #[arg()]
+        name: String,
+    },
 }
