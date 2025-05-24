@@ -1,9 +1,7 @@
 use gt_tools::CreateReleaseOption;
 use gt_tools::{ReleaseInfo, cli::Args};
-use serde::{Deserialize, Serialize};
 
 use std::env;
-use std::io::Read;
 
 use clap::Parser;
 

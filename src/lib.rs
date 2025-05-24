@@ -2,10 +2,6 @@ use serde::{Deserialize, Serialize};
 
 pub mod cli;
 
-pub fn module_echo() {
-    println!("hello from lib.rs!");
-}
-
 /// A struct matching a Gitea "Release" entry
 #[derive(Deserialize, Debug, Serialize)]
 pub struct ReleaseInfo {
@@ -57,5 +53,5 @@ pub struct ApiError {
 pub enum CreateResult {
     Success(ReleaseInfo),
     ErrWithMessage(ApiError),
-    Empty
+    Empty,
 }
