@@ -1,5 +1,7 @@
 use serde::Deserialize;
 
+pub mod cli;
+
 pub fn module_echo(){
     println!("hello from lib.rs!");
 }

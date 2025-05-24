@@ -1,4 +1,9 @@
-use gt_tools::ReleaseInfo;
+use gt_tools::{
+    ReleaseInfo,
+    cli::Args
+};
+
+use clap::Parser;
 
 use reqwest::Error;
 use reqwest::header::{
@@ -8,6 +13,10 @@ use reqwest::header::{
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
+    let args = Args::parse();
+
+    println!("{:?}", args);
+    
     let request_url = format!(
         "http:/localhost:3000/api/v1/repos/{owner}/{repo}/releases",
         owner = "robert",
