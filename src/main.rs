@@ -15,15 +15,6 @@ const API_RELEASE_BACK: &'static str = "/releases";
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     let args = Args::parse();
-
-    let request_url = format!(
-        "{hostname}{front}{owner}{repo}{back}",
-        hostname = API_HOSTNAME,
-        front = API_RELEASE_FRONT,
-        owner = "robert",
-        repo = "rcalc",
-        back = API_RELEASE_BACK
-    );
     let client = reqwest::Client::new();
     match args.command {
         gt_tools::cli::Commands::ListReleases => {
@@ -45,7 +36,7 @@ async fn main() -> Result<(), Error> {
                 tag_name: String::from("big-goof"),
                 target_commitish: String::from("548ceecc7528901a7b4376091b42e410d950affc"),
             };
-            do_create_release(&client, &request_url, submission).await?;
+            do_create_release(&client, submission).await?;
         }
     }
 
@@ -76,14 +67,21 @@ async fn do_list_releases(
 #[must_use]
 async fn do_create_release(
     client: &reqwest::Client,
-    endpoint: &str,
     submission: CreateReleaseOption,
 ) -> Result<(), Error> {
     let token = env::var("RELEASE_KEY_GITEA").expect(
         "You must set the RELEASE_KEY_GITEA environment variable so the Gitea API can be used.",
     );
+    let request_url = format!(
+        "{hostname}{front}{owner}{repo}{back}",
+        hostname = API_HOSTNAME,
+        front = API_RELEASE_FRONT,
+        owner = "robert",
+        repo = "rcalc",
+        back = API_RELEASE_BACK
+    );
     let response = client
-        .post(endpoint)
+        .post(request_url)
         .header(USER_AGENT, "gt-tools-test-agent")
         .header(ACCEPT, "application/json")
         .header("Authorization", format!("token {}", token))
