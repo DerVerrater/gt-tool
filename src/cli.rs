@@ -3,10 +3,10 @@ use clap::{Parser, Subcommand};
 #[derive(Debug, Parser)]
 #[command(version, about, long_about = None)]
 pub struct Args {
-    #[arg(short = 'o', long = "owner")]
-    pub repo_owner: Option<String>,
-    #[arg(short = 'n', long = "repo_name")]
-    pub repo_name: Option<String>,
+    #[arg(short = 'o', long = "owner", env = "GTTOOL_OWNER")]
+    pub owner: String,
+    #[arg(short = 'r', long = "repo")]
+    pub repo: Option<String>,
 
     #[command(subcommand)]
     pub command: Commands,
