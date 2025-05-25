@@ -8,7 +8,6 @@ use clap::Parser;
 use reqwest::Error;
 use reqwest::header::{ACCEPT, USER_AGENT};
 
-const API_HOSTNAME: &'static str = "http://localhost:3000";
 const API_RELEASE_FRONT: &'static str = "/api/v1/repos/";
 const API_RELEASE_BACK: &'static str = "/releases";
 
@@ -18,7 +17,7 @@ async fn main() -> Result<(), Error> {
     let client = reqwest::Client::new();
     match args.command {
         gt_tools::cli::Commands::ListReleases => {
-            let releases = do_list_releases(&client, "robert", "rcalc").await?;
+            let releases = do_list_releases(&client, &args.gitea_url, &args.repo).await?;
             for release in releases {
                 println!("{:?}", release);
             }
@@ -39,7 +38,7 @@ async fn main() -> Result<(), Error> {
                 tag_name,
                 target_commitish,
             };
-            do_create_release(&client, submission).await?;
+            do_create_release(&client, &args.gitea_url, &args.repo, submission).await?;
         }
     }
 
@@ -48,12 +47,11 @@ async fn main() -> Result<(), Error> {
 
 async fn do_list_releases(
     client: &reqwest::Client,
-    owner: &str,
+    gitea_url: &str,
     repo: &str,
 ) -> Result<Vec<ReleaseInfo>, Error> {
     let request_url = format!(
-        "{hostname}{front}{owner}/{repo}{back}",
-        hostname = API_HOSTNAME,
+        "{gitea_url}{front}{repo}{back}",
         front = API_RELEASE_FRONT,
         back = API_RELEASE_BACK
     );
@@ -73,17 +71,16 @@ async fn do_list_releases(
 #[must_use]
 async fn do_create_release(
     client: &reqwest::Client,
+    gitea_url: &str,
+    repo: &str,
     submission: CreateReleaseOption,
 ) -> Result<(), Error> {
     let token = env::var("RELEASE_KEY_GITEA").expect(
         "You must set the RELEASE_KEY_GITEA environment variable so the Gitea API can be used.",
     );
     let request_url = format!(
-        "{hostname}{front}{owner}/{repo}{back}",
-        hostname = API_HOSTNAME,
+        "{gitea_url}{front}{repo}{back}",
         front = API_RELEASE_FRONT,
-        owner = "robert",
-        repo = "rcalc",
         back = API_RELEASE_BACK
     );
     let response = client
