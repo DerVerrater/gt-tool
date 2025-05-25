@@ -40,6 +40,19 @@ async fn main() -> Result<(), Error> {
             };
             do_create_release(&client, &args.gitea_url, &args.repo, submission).await?;
         }
+        gt_tools::cli::Commands::UploadRelease {
+            tag_name,
+            create,
+            files
+        } => {
+            println!("Uploading files to a release!");
+            println!("Release Tag: {tag_name}");
+            println!("Creating?: {create}");
+            println!("Files...");
+            for file in files {
+                println!("--- {file}");
+            }
+        }
     }
 
     Ok(())

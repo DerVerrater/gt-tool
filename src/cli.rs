@@ -29,4 +29,12 @@ pub enum Commands {
         #[arg()]
         target_commitish: String,
     },
+    UploadRelease {
+        #[arg()]
+        tag_name: String,
+        #[arg(short, long, default_value_t = false)]
+        create: bool,
+        #[arg()]
+        files: Vec<String>
+    }
 }
