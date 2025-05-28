@@ -147,7 +147,6 @@ async fn do_upload_release(
         .post(request_url)
         .header(USER_AGENT, "gt-tools-test-agent")
         .header(ACCEPT, "application/json")
-        // .header("Content-Type", "multipart/form-data")
         .header("Authorization", format!("token {}", token));
     
     // Ensure all files exists before starting the uploads
@@ -169,11 +168,9 @@ async fn do_upload_release(
 
             let request = request
                 .multipart(form)
-                .query(&[("name", file.split("/").last())]);
-            dbg!(&request);
-            let response = request.send().await?;
-            dbg!(&response);
-            dbg!(&response.text().await?);
+                .query(&[("name", file.split("/").last())])
+                .send()
+                .await?;
         } else {
             panic!("Failed to clone the RequestBuilder during file upload loop.");
         }
