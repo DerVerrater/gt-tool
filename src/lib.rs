@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 
 pub mod cli;
+pub mod api;
+pub mod structs;
 
 /// A struct matching a Gitea "Release" entry
 #[derive(Debug, Deserialize, Serialize)]
