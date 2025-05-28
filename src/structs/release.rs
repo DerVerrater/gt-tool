@@ -1,5 +1,33 @@
+use serde::{Deserialize, Serialize};
 
-pub struct Release;
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Release {
+    id: usize,
+    tag_name: String,
+    target_commitish: String,
+    name: String,
+    body: String,
+    url: String,
+    html_url: String,
+    tarball_url: String,
+    zipball_url: String,
+    upload_url: String,
+    draft: bool,
+    prerelease: bool,
+    created_at: String,
+    published_at: String,
+    author: Author,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Author {
+    id: usize,
+    login: String,
+    login_name: String,
+    source_id: usize,
+    full_name: String,
+    email: String,
+}
 
 pub struct CreateReleaseOption;
 

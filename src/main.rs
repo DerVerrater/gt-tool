@@ -1,5 +1,5 @@
 use gt_tools::CreateReleaseOption;
-use gt_tools::{ReleaseInfo, cli::Args};
+use gt_tools::{structs::release::Release, cli::Args};
 use reqwest::multipart::Part;
 
 use std::collections::HashMap;
@@ -76,7 +76,7 @@ async fn do_list_releases(
     client: &reqwest::Client,
     gitea_url: &str,
     repo: &str,
-) -> Result<Vec<ReleaseInfo>, Error> {
+) -> Result<Vec<Release>, Error> {
     let request_url = format!(
         "{gitea_url}{front}{repo}{back}",
         front = API_RELEASE_FRONT,
@@ -91,7 +91,7 @@ async fn do_list_releases(
     // TODO: Handle case with no releases.
     // afaict: Serde tries to unpack an empty list, can't decide what struct it's unpacking,
     // and emits an error. Desired behavior: empty Vec.
-    let body_text: Vec<ReleaseInfo> = response.json().await?;
+    let body_text: Vec<Release> = response.json().await?;
     return Ok(body_text);
 }
 
