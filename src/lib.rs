@@ -10,6 +10,13 @@ pub struct ApiError {
     url: String,
 }
 
+#[derive(Debug)]
+pub enum Error {
+    Placeholder, // TODO: Enumerate error modes
+    WrappedReqwestErr(reqwest::Error)
+}
+type Result<T> = core::result::Result<T, Error>;
+
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(untagged)]
 pub enum CreateResult {
