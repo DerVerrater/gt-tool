@@ -169,7 +169,7 @@ async fn do_upload_release(
 
             let request = request
                 .multipart(form)
-                .query(&[("name", &file)]);
+                .query(&[("name", file.split("/").last())]);
             dbg!(&request);
             let response = request.send().await?;
             dbg!(&response);
