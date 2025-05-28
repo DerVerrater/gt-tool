@@ -1,3 +1,3 @@
 
 pub mod packages;
-pub mod repo;
+pub mod release;
