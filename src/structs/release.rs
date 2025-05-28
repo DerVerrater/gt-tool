@@ -29,7 +29,15 @@ pub struct Author {
     email: String,
 }
 
-pub struct CreateReleaseOption;
+#[derive(Debug, Serialize)]
+pub struct CreateReleaseOption {
+    pub body: String,
+    pub draft: bool,
+    pub name: String,
+    pub prerelease: bool,
+    pub tag_name: String,
+    pub target_commitish: String,
+}
 
 pub struct EditReleaseOption;
 

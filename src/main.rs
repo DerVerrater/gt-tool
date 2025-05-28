@@ -1,4 +1,4 @@
-use gt_tools::CreateReleaseOption;
+use gt_tools::structs::release::CreateReleaseOption;
 use gt_tools::{structs::release::Release, cli::Args};
 use reqwest::multipart::Part;
 
