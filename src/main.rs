@@ -22,7 +22,11 @@ async fn main() -> Result<(), Error> {
     let client = reqwest::Client::new();
     match args.command {
         gt_tools::cli::Commands::ListReleases => {
-            let releases = do_list_releases(&client, &args.gitea_url, &args.repo).await?;
+            let releases = gt_tools::api::release::list_releases(
+                &client,
+                &args.gitea_url,
+                &args.repo
+            ).await.unwrap();
             for release in releases {
                 println!("{:?}", release);
             }
@@ -70,29 +74,6 @@ async fn main() -> Result<(), Error> {
     }
 
     Ok(())
-}
-
-async fn do_list_releases(
-    client: &reqwest::Client,
-    gitea_url: &str,
-    repo: &str,
-) -> Result<Vec<Release>, Error> {
-    let request_url = format!(
-        "{gitea_url}{front}{repo}{back}",
-        front = API_RELEASE_FRONT,
-        back = API_RELEASE_BACK
-    );
-    let response = client
-        .get(request_url)
-        .header(USER_AGENT, "gt-tools-test-agent")
-        .header(ACCEPT, "application/json")
-        .send()
-        .await?;
-    // TODO: Handle case with no releases.
-    // afaict: Serde tries to unpack an empty list, can't decide what struct it's unpacking,
-    // and emits an error. Desired behavior: empty Vec.
-    let body_text: Vec<Release> = response.json().await?;
-    return Ok(body_text);
 }
 
 #[must_use]
