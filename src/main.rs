@@ -72,13 +72,13 @@ async fn main() -> Result<(), gt_tools::Error> {
             }
             // TODO: Pre-create the release, if it doesn't exist.
             // TODO: Find an existing release and use it's ID, if it does
-            do_upload_release(
+            gt_tools::api::release_attachment::create_release_attachment(
                 &client,
                 &args.gitea_url,
                 &args.repo,
                 52usize,
                 files
-            ).await.map_err(reqwest_to_gttool)?;
+            ).await?;
         }
     }
 
