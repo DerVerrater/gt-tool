@@ -76,7 +76,3 @@ async fn main() -> Result<(), gt_tools::Error> {
 
     Ok(())
 }
-
-fn reqwest_to_gttool(err: reqwest::Error) -> gt_tools::Error {
-    gt_tools::Error::WrappedReqwestErr(err)
-}
