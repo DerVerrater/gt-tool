@@ -1,6 +1,6 @@
 
 use crate::{
-    structs::release::Release, Result
+    structs::release::{CreateReleaseOption, Release}, Result
 };
 
 pub fn get_release(id: u64) -> Result<Release> { todo!(); }
@@ -31,7 +31,25 @@ pub async fn list_releases(
     return Ok(release_list);
 }
 
-pub fn create_release() -> Result<Release> { todo!(); }
+pub async fn create_release(
+    client: &reqwest::Client,
+    gitea_url: &str,
+    repo: &str,
+    submission: CreateReleaseOption
+) -> Result<Release> {
+    let request_url = format!("{gitea_url}/api/v1/repos/{repo}/releases");
+    let req = client
+        .post(request_url)
+        .json(&submission)
+        .send()
+        .await
+        .map_err(|e| crate::Error::from(e))?;
+    let new_release = req
+        .json::<Release>()
+        .await
+        .map_err(|e| crate::Error::from(e))?;
+    return Ok(new_release);
+}
 pub fn edit_release(id: u64) -> Result<Release> { todo!(); }
 pub fn delete_release(id: u64) -> Result<()> { todo!(); }
 

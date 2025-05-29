@@ -13,8 +13,16 @@ pub struct ApiError {
 #[derive(Debug)]
 pub enum Error {
     Placeholder, // TODO: Enumerate error modes
-    WrappedReqwestErr(reqwest::Error)
+    WrappedReqwestErr(reqwest::Error),
+    MissingAuthToken,
 }
+
+impl From<reqwest::Error> for crate::Error {
+    fn from(value: reqwest::Error) -> Self {
+        Self::WrappedReqwestErr(value)
+    }
+}
+
 type Result<T> = core::result::Result<T, Error>;
 
 #[derive(Debug, Deserialize, Serialize)]

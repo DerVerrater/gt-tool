@@ -55,9 +55,8 @@ async fn main() -> Result<(), gt_tools::Error> {
                 tag_name,
                 target_commitish,
             };
-            do_create_release(&client, &args.gitea_url, &args.repo, submission)
-                .await
-                .map_err(reqwest_to_gttool)?;
+            gt_tools::api::release::create_release(&client, &args.gitea_url, &args.repo, submission)
+                .await?;
         }
         gt_tools::cli::Commands::UploadRelease {
             tag_name,
