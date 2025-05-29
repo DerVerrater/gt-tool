@@ -10,7 +10,7 @@ use std::{
 
 use clap::Parser;
 
-use reqwest::Error;
+use reqwest::{header, Error};
 use reqwest::header::{ACCEPT, USER_AGENT};
 
 const API_RELEASE_FRONT: &'static str = "/api/v1/repos/";
@@ -19,7 +19,17 @@ const API_RELEASE_BACK: &'static str = "/releases";
 #[tokio::main]
 async fn main() -> Result<(), gt_tools::Error> {
     let args = Args::parse();
-    let client = reqwest::Client::new();
+    let token = std::env::var("RELEASE_KEY_GITEA")
+        .map_err(|_| gt_tools::Error::MissingAuthToken )?;
+
+    let mut headers = reqwest::header::HeaderMap::new();
+    headers.append(ACCEPT, header::HeaderValue::from_static("application/json"));
+    headers.append("Authorization", token.parse().unwrap());
+    let client = reqwest::Client::builder()
+        .user_agent("gt-tools-test-agent")
+        .default_headers(headers)
+        .build()?;
+
     match args.command {
         gt_tools::cli::Commands::ListReleases => {
             let releases = gt_tools::api::release::list_releases(
