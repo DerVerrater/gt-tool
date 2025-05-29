@@ -11,7 +11,7 @@ pub async fn list_releases(
     gitea_url: &str,
     repo: &str,
 ) -> Result<Vec<Release>> {
-    let request_url = format!("{gitea_url}/repos/{repo}/releases/");
+    let request_url = format!("{gitea_url}/api/v1/repos/{repo}/releases/");
     let req = client
         .get(request_url)
         .send()
