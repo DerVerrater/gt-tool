@@ -17,7 +17,7 @@ const API_RELEASE_FRONT: &'static str = "/api/v1/repos/";
 const API_RELEASE_BACK: &'static str = "/releases";
 
 #[tokio::main]
-async fn main() -> Result<(), Error> {
+async fn main() -> Result<(), gt_tools::Error> {
     let args = Args::parse();
     let client = reqwest::Client::new();
     match args.command {
@@ -26,7 +26,7 @@ async fn main() -> Result<(), Error> {
                 &client,
                 &args.gitea_url,
                 &args.repo
-            ).await.unwrap();
+            ).await?;
             for release in releases {
                 println!("{:?}", release);
             }
@@ -47,7 +47,9 @@ async fn main() -> Result<(), Error> {
                 tag_name,
                 target_commitish,
             };
-            do_create_release(&client, &args.gitea_url, &args.repo, submission).await?;
+            do_create_release(&client, &args.gitea_url, &args.repo, submission)
+                .await
+                .map_err(reqwest_to_gttool)?;
         }
         gt_tools::cli::Commands::UploadRelease {
             tag_name,
@@ -69,11 +71,15 @@ async fn main() -> Result<(), Error> {
                 &args.repo,
                 52usize,
                 files
-            ).await?;
+            ).await.map_err(reqwest_to_gttool)?;
         }
     }
 
     Ok(())
+}
+
+fn reqwest_to_gttool(err: reqwest::Error) -> gt_tools::Error {
+    gt_tools::Error::WrappedReqwestErr(err)
 }
 
 #[must_use]
