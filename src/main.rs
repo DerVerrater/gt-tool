@@ -89,36 +89,6 @@ fn reqwest_to_gttool(err: reqwest::Error) -> gt_tools::Error {
     gt_tools::Error::WrappedReqwestErr(err)
 }
 
-#[must_use]
-async fn do_create_release(
-    client: &reqwest::Client,
-    gitea_url: &str,
-    repo: &str,
-    submission: CreateReleaseOption,
-) -> Result<(), Error> {
-    let token = env::var("RELEASE_KEY_GITEA").expect(
-        "You must set the RELEASE_KEY_GITEA environment variable so the Gitea API can be used.",
-    );
-    let request_url = format!(
-        "{gitea_url}{front}{repo}{back}",
-        front = API_RELEASE_FRONT,
-        back = API_RELEASE_BACK
-    );
-    let response = client
-        .post(request_url)
-        .header(USER_AGENT, "gt-tools-test-agent")
-        .header(ACCEPT, "application/json")
-        .header("Authorization", format!("token {}", token))
-        .json(&submission)
-        .send()
-        .await?;
-
-    println!("HTTP Response: {}", response.status());
-    let result: gt_tools::CreateResult = response.json().await?;
-    println!("{:?}", result);
-    Ok(())
-}
-
 async fn do_upload_release(
     client: &reqwest::Client,
     gitea_url: &str,
