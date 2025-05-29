@@ -15,6 +15,7 @@ pub enum Error {
     Placeholder, // TODO: Enumerate error modes
     WrappedReqwestErr(reqwest::Error),
     MissingAuthToken,
+    NoSuchFile, // for release attachment 'file exists' pre-check.
 }
 
 impl From<reqwest::Error> for crate::Error {
