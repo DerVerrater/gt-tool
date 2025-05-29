@@ -1,18 +1,10 @@
 use gt_tools::structs::release::CreateReleaseOption;
 use gt_tools::cli::Args;
 
-use std::{
-    env,
-    fs
-};
-
 use clap::Parser;
 
-use reqwest::{header, Error};
-use reqwest::header::{ACCEPT, USER_AGENT};
-
-const API_RELEASE_FRONT: &'static str = "/api/v1/repos/";
-const API_RELEASE_BACK: &'static str = "/releases";
+use reqwest::header;
+use reqwest::header::ACCEPT;
 
 #[tokio::main]
 async fn main() -> Result<(), gt_tools::Error> {
