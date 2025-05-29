@@ -1,8 +1,6 @@
 use gt_tools::structs::release::CreateReleaseOption;
-use gt_tools::{structs::release::Release, cli::Args};
-use reqwest::multipart::Part;
+use gt_tools::cli::Args;
 
-use std::collections::HashMap;
 use std::{
     env,
     fs
