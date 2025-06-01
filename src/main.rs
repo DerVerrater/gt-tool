@@ -19,7 +19,10 @@ async fn main() -> Result<(), gt_tools::Error> {
         headers.append("Authorization", token.parse().unwrap());
     }
     let client = reqwest::Client::builder()
-        .user_agent("gt-tools-test-agent")
+        .user_agent(format!(
+            "gt-tools-agent-{}",
+            env!("CARGO_PKG_VERSION")
+        ))
         .default_headers(headers)
         .build()?;
 
