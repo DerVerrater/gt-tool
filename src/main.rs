@@ -1,4 +1,5 @@
-use gt_tools::structs::release::CreateReleaseOption;
+
+use gt_tools::structs::release::{CreateReleaseOption, Release};
 use gt_tools::cli::Args;
 
 use clap::Parser;
@@ -66,16 +67,61 @@ async fn main() -> Result<(), gt_tools::Error> {
                 println!("--- {file}");
             }
             // TODO: Pre-create the release, if it doesn't exist.
-            // TODO: Find an existing release and use it's ID, if it does
-            gt_tools::api::release_attachment::create_release_attachment(
+            
+            // There's only Gitea APIs to get all releases, or one by-id.
+            // Grab all, find the one that matches the input tag.
+            // Scream if there are multiple matches.
+            let release_candidates = gt_tools::api::release::list_releases(
                 &client,
                 &args.gitea_url,
-                &args.repo,
-                52usize,
-                files
+                &args.repo
             ).await?;
+
+            if let Some(release) = match_release_by_tag(&tag_name, release_candidates) {
+                gt_tools::api::release_attachment::create_release_attachment(
+                    &client,
+                    &args.gitea_url,
+                    &args.repo,
+                    release.id,
+                    files
+                ).await?;
+            } else {
+                println!("ERR: Couldn't find a release matching the tag \"{tag_name}\".");
+            }
         }
     }
 
     Ok(())
 }
+
+// Util to scan a release list for a given tag. Returns Some(release) if found,
+// None if not, and crashes the program if multiple are found.
+//
+// The Gitea webpage won't create multiple releases for a given tag, but the
+// API might... And someone could always fiddle with the database directly.
+// Until I find a guarantee of any particular behavior, I'm going to assume it
+// *can* happen and crash when it does. Clearly it isn't supposed to, so I'm
+// not going to meaningfully handle it, only prevent garbage from propagating.
+fn match_release_by_tag(tag: &String, releases: Vec<Release>) -> Option<Release> {
+    let mut release: Option<Release> = None;
+    for rel in releases {
+        if rel.tag_name == *tag {
+            // Only store the value if one hasn't been stored already
+            if let Some(first_release) = &release {
+                // if there was already a match, begin the error diagnostic creation.
+                let first_id = first_release.id;
+                let second_id = rel.id;
+                assert!(first_id != second_id, "FAILURE: Found the same release ID twice while scanning for duplicate tags. How did we get the same one twice?");
+                eprintln!("ERROR: Two releases have been found for the tag \"{tag}\".");
+                eprintln!("ERROR:    first ID: {first_id}");
+                eprintln!("ERROR:    second ID: {second_id}");
+                panic!("ERROR: Nonsense detected, I'm bailing out!");
+            } else {
+                // else, store our first (and hopefully only) match
+                release = Some(rel);
+            }
+        }
+    }
+    return release;
+}
+

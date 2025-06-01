@@ -2,8 +2,8 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Release {
-    id: usize,
-    tag_name: String,
+    pub id: usize,
+    pub tag_name: String,
     target_commitish: String,
     name: String,
     body: String,
