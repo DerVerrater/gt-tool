@@ -27,10 +27,3 @@ impl From<reqwest::Error> for crate::Error {
 
 type Result<T> = core::result::Result<T, Error>;
 
-#[derive(Debug, Deserialize, Serialize)]
-#[serde(untagged)]
-pub enum CreateResult {
-    Success(structs::release::Release),
-    ErrWithMessage(ApiError),
-    Empty,
-}

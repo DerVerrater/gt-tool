@@ -1,6 +1,8 @@
 
+use serde::{Deserialize, Serialize};
+
 use crate::{
-    structs::release::{CreateReleaseOption, Release}, CreateResult, Result
+    structs::{self, release::{CreateReleaseOption, Release}}, ApiError, Result
 };
 
 pub fn get_release(id: u64) -> Result<Release> { todo!(); }
@@ -29,6 +31,14 @@ pub async fn list_releases(
             crate::Error::WrappedReqwestErr(reqwest_err)
         })?;
     return Ok(release_list);
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(untagged)]
+enum CreateResult {
+    Success(structs::release::Release),
+    ErrWithMessage(ApiError),
+    Empty,
 }
 
 pub async fn create_release(
