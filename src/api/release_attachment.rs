@@ -1,9 +1,8 @@
 use std::fs;
 
-
-pub fn check_release_match_repo(){}
-pub fn get_release_attachment(){}
-pub fn list_release_attachments(){
+pub fn check_release_match_repo() {}
+pub fn get_release_attachment() {}
+pub fn list_release_attachments() {
     todo!();
 }
 pub async fn create_release_attachment(
@@ -14,7 +13,7 @@ pub async fn create_release_attachment(
     files: Vec<String>,
 ) -> crate::Result<()> {
     let request_url = format!("{gitea_url}/api/v1/repos/{repo}/releases/{release_id}/assets");
-    
+
     // Ensure all files exists before starting the uploads
     for file in &files {
         if let Err(e) = fs::exists(file) {
@@ -27,9 +26,8 @@ pub async fn create_release_attachment(
         let data = reqwest::multipart::Part::stream(fs::read(&file).unwrap())
             .file_name("attachment")
             .mime_str("text/plain")?;
-    
-        let form= reqwest::multipart::Form::new()
-            .part("attachment", data);
+
+        let form = reqwest::multipart::Form::new().part("attachment", data);
 
         let request = client
             .post(&request_url)
@@ -40,6 +38,5 @@ pub async fn create_release_attachment(
     }
     Ok(())
 }
-pub fn edit_release_attachment(){}
-pub fn delete_release_attachment(){}
-
+pub fn edit_release_attachment() {}
+pub fn delete_release_attachment() {}

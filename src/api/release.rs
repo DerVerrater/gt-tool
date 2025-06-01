@@ -1,12 +1,19 @@
-
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    structs::{self, release::{CreateReleaseOption, Release}}, ApiError, Result
+    ApiError, Result,
+    structs::{
+        self,
+        release::{CreateReleaseOption, Release},
+    },
 };
 
-pub fn get_release(id: u64) -> Result<Release> { todo!(); }
-pub fn get_latest_release() -> Result<Release> { todo!(); }
+pub fn get_release(id: u64) -> Result<Release> {
+    todo!();
+}
+pub fn get_latest_release() -> Result<Release> {
+    todo!();
+}
 
 pub async fn list_releases(
     client: &reqwest::Client,
@@ -14,14 +21,8 @@ pub async fn list_releases(
     repo: &str,
 ) -> Result<Vec<Release>> {
     let request_url = format!("{gitea_url}/api/v1/repos/{repo}/releases/");
-    let req = client
-        .get(request_url)
-        .send()
-        .await;
-    let response = req
-        .map_err(|reqwest_err| {
-            crate::Error::WrappedReqwestErr(reqwest_err)
-        })?;
+    let req = client.get(request_url).send().await;
+    let response = req.map_err(|reqwest_err| crate::Error::WrappedReqwestErr(reqwest_err))?;
     let release_list = response
         .json::<Vec<Release>>()
         .await
@@ -45,7 +46,7 @@ pub async fn create_release(
     client: &reqwest::Client,
     gitea_url: &str,
     repo: &str,
-    submission: CreateReleaseOption
+    submission: CreateReleaseOption,
 ) -> Result<Release> {
     let request_url = format!("{gitea_url}/api/v1/repos/{repo}/releases");
     let req = client
@@ -66,10 +67,13 @@ pub async fn create_release(
             } else {
                 Err(crate::Error::ApiErrorMessage(api_error))
             }
-        },
+        }
         CreateResult::Empty => panic!("How can we have 200 OK and no release info? No. Crash"),
     }
 }
-pub fn edit_release(id: u64) -> Result<Release> { todo!(); }
-pub fn delete_release(id: u64) -> Result<()> { todo!(); }
-
+pub fn edit_release(id: u64) -> Result<Release> {
+    todo!();
+}
+pub fn delete_release(id: u64) -> Result<()> {
+    todo!();
+}

@@ -35,6 +35,6 @@ pub enum Commands {
         #[arg(short, long, default_value_t = false)]
         create: bool,
         #[arg()]
-        files: Vec<String>
-    }
+        files: Vec<String>,
+    },
 }

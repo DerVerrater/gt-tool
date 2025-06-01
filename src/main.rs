@@ -1,6 +1,5 @@
-
-use gt_tools::structs::release::{CreateReleaseOption, Release};
 use gt_tools::cli::Args;
+use gt_tools::structs::release::{CreateReleaseOption, Release};
 
 use clap::Parser;
 
@@ -10,10 +9,10 @@ use reqwest::header::ACCEPT;
 #[tokio::main]
 async fn main() -> Result<(), gt_tools::Error> {
     let args = Args::parse();
-    
+
     let mut headers = reqwest::header::HeaderMap::new();
     headers.append(ACCEPT, header::HeaderValue::from_static("application/json"));
-    
+
     // Gitea expects to see "token " for token auth.
     if let Ok(token) = std::env::var("RELEASE_KEY_GITEA") {
         let token = format!("token {token}");
@@ -26,11 +25,8 @@ async fn main() -> Result<(), gt_tools::Error> {
 
     match args.command {
         gt_tools::cli::Commands::ListReleases => {
-            let releases = gt_tools::api::release::list_releases(
-                &client,
-                &args.gitea_url,
-                &args.repo
-            ).await?;
+            let releases =
+                gt_tools::api::release::list_releases(&client, &args.gitea_url, &args.repo).await?;
             for release in releases {
                 println!("{:?}", release);
             }
@@ -51,13 +47,18 @@ async fn main() -> Result<(), gt_tools::Error> {
                 tag_name,
                 target_commitish,
             };
-            gt_tools::api::release::create_release(&client, &args.gitea_url, &args.repo, submission)
-                .await?;
+            gt_tools::api::release::create_release(
+                &client,
+                &args.gitea_url,
+                &args.repo,
+                submission,
+            )
+            .await?;
         }
         gt_tools::cli::Commands::UploadRelease {
             tag_name,
             create,
-            files
+            files,
         } => {
             println!("Uploading files to a release!");
             println!("Release Tag: {tag_name}");
@@ -67,15 +68,12 @@ async fn main() -> Result<(), gt_tools::Error> {
                 println!("--- {file}");
             }
             // TODO: Pre-create the release, if it doesn't exist.
-            
+
             // There's only Gitea APIs to get all releases, or one by-id.
             // Grab all, find the one that matches the input tag.
             // Scream if there are multiple matches.
-            let release_candidates = gt_tools::api::release::list_releases(
-                &client,
-                &args.gitea_url,
-                &args.repo
-            ).await?;
+            let release_candidates =
+                gt_tools::api::release::list_releases(&client, &args.gitea_url, &args.repo).await?;
 
             if let Some(release) = match_release_by_tag(&tag_name, release_candidates) {
                 gt_tools::api::release_attachment::create_release_attachment(
@@ -83,8 +81,9 @@ async fn main() -> Result<(), gt_tools::Error> {
                     &args.gitea_url,
                     &args.repo,
                     release.id,
-                    files
-                ).await?;
+                    files,
+                )
+                .await?;
             } else {
                 println!("ERR: Couldn't find a release matching the tag \"{tag_name}\".");
             }
@@ -111,7 +110,10 @@ fn match_release_by_tag(tag: &String, releases: Vec<Release>) -> Option<Release>
                 // if there was already a match, begin the error diagnostic creation.
                 let first_id = first_release.id;
                 let second_id = rel.id;
-                assert!(first_id != second_id, "FAILURE: Found the same release ID twice while scanning for duplicate tags. How did we get the same one twice?");
+                assert!(
+                    first_id != second_id,
+                    "FAILURE: Found the same release ID twice while scanning for duplicate tags. How did we get the same one twice?"
+                );
                 eprintln!("ERROR: Two releases have been found for the tag \"{tag}\".");
                 eprintln!("ERROR:    first ID: {first_id}");
                 eprintln!("ERROR:    second ID: {second_id}");
@@ -124,4 +126,3 @@ fn match_release_by_tag(tag: &String, releases: Vec<Release>) -> Option<Release>
     }
     return release;
 }
-

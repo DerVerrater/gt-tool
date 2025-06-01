@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
-pub mod cli;
 pub mod api;
+pub mod cli;
 pub mod structs;
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -26,4 +26,3 @@ impl From<reqwest::Error> for crate::Error {
 }
 
 type Result<T> = core::result::Result<T, Error>;
-

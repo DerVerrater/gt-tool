@@ -40,4 +40,3 @@ pub struct CreateReleaseOption {
 }
 
 pub struct EditReleaseOption;
-
