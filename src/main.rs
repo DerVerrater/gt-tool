@@ -9,8 +9,12 @@ use reqwest::header::ACCEPT;
 #[tokio::main]
 async fn main() -> Result<(), gt_tools::Error> {
     let args = Args::parse();
-    let token = std::env::var("RELEASE_KEY_GITEA")
-        .map_err(|_| gt_tools::Error::MissingAuthToken )?;
+    // Gitea expects to see "token " for token auth.
+    let token = format!(
+        "token {}",
+        std::env::var("RELEASE_KEY_GITEA")
+            .map_err(|_| gt_tools::Error::MissingAuthToken )?
+    );
 
     let mut headers = reqwest::header::HeaderMap::new();
     headers.append(ACCEPT, header::HeaderValue::from_static("application/json"));
