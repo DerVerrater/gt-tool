@@ -1,4 +1,5 @@
-use std::fs;
+
+use std::path;
 
 use gt_tool::cli::Args;
 use gt_tool::structs::release::{CreateReleaseOption, Release};
@@ -81,7 +82,8 @@ async fn main() -> Result<(), gt_tool::Error> {
 
             if let Some(release) = match_release_by_tag(&tag_name, release_candidates) {
                 for file in &files {
-                    match fs::exists(file) {
+                    let path = path::Path::new(&file);
+                    match path.try_exists() {
                         Ok(true) => continue,
                         Ok(false) => return Err(gt_tool::Error::NoSuchFile),
                         Err(e) => {

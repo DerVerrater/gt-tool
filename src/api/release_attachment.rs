@@ -1,4 +1,4 @@
-use std::fs;
+use std::{fs, path};
 
 use crate::structs::Attachment;
 
@@ -16,7 +16,8 @@ pub async fn create_release_attachment(
 ) -> crate::Result<Attachment> {
     let request_url = format!("{gitea_url}/api/v1/repos/{repo}/releases/{release_id}/assets");
 
-    match fs::exists(&file) {
+    let path = path::Path::new(&file);
+    match path.try_exists() {
         Ok(true) => (),
         Ok(false) => return Err(crate::Error::NoSuchFile),
         Err(e) => {
