@@ -16,6 +16,7 @@ pub enum Error {
     WrappedReqwestErr(reqwest::Error),
     MissingAuthToken,
     NoSuchFile, // for release attachment 'file exists' pre-check.
+    ApiErrorMessage(ApiError),
 }
 
 impl From<reqwest::Error> for crate::Error {
