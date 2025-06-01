@@ -18,7 +18,7 @@ pub enum Commands {
     CreateRelease {
         #[arg()]
         body: String,
-        #[arg(short, long, default_value_t = false)]
+        #[arg(short, long)]
         draft: bool,
         #[arg()]
         name: String,
@@ -32,7 +32,7 @@ pub enum Commands {
     UploadRelease {
         #[arg()]
         tag_name: String,
-        #[arg(short, long, default_value_t = false)]
+        #[arg(short, long)]
         create: bool,
         #[arg()]
         files: Vec<String>,
