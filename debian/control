@@ -1,0 +1,30 @@
+Source: gt-tool
+Maintainer: Robert Garrett <robertgarrett404@gmail.com>
+Section: misc
+Priority: optional
+Standards-Version: 4.6.2
+Build-Depends:
+ debhelper-compat (= 13),
+ dh-cargo,
+ librust-clap-dev,
+ librust-reqwest-dev,
+ librust-tokio-dev,
+ librust-serde-dev,
+Homepage: https://git.gelvin.dev/robert/gt-tool
+Vcs-Git: https://git.gelvin.dev/robert/gt-tool
+Vcs-Browser: https://git.gelvin.dev/robert/gt-tool
+Rules-Requires-Root: no
+
+Package: gt-tool
+Architecture: any
+Depends:
+ ${misc:Depends},
+ ${shlibs:Depends},
+Description: CLI tools for interacting with the Gitea API.
+ Use interactively to talk to your Gitea instance, or automatically via a CI/CD
+ pipeline. Currently supports:
+ .
+  - showing the Releases for a project
+  - creating a new Release for a project
+  - attaching files to a release
+
