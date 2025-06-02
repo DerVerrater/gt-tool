@@ -38,7 +38,6 @@ async fn main() -> Result<(), gt_tools::Error> {
             name,
             body,
             draft,
-            prerelease,
             tag_name,
             target_commitish,
         } => {
@@ -46,7 +45,7 @@ async fn main() -> Result<(), gt_tools::Error> {
                 body,
                 draft,
                 name,
-                prerelease,
+                prerelease: false,
                 tag_name,
                 target_commitish,
             };

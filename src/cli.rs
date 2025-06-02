@@ -22,8 +22,6 @@ pub enum Commands {
         draft: bool,
         #[arg()]
         name: String,
-        #[arg(short, long)]
-        prerelease: bool,
         #[arg()]
         tag_name: String,
         #[arg()]
