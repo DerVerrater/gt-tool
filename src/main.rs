@@ -59,12 +59,12 @@ async fn main() -> Result<(), gt_tools::Error> {
         }
         gt_tools::cli::Commands::UploadRelease {
             tag_name,
-            create,
+            // create,
             files,
         } => {
             println!("Uploading files to a release!");
             println!("Release Tag: {tag_name}");
-            println!("Creating?: {create}");
+            // println!("Creating?: {create}");
             println!("Files...");
             for file in &files {
                 println!("--- {file}");

@@ -30,8 +30,9 @@ pub enum Commands {
     UploadRelease {
         #[arg()]
         tag_name: String,
-        #[arg(short, long)]
-        create: bool,
+        // TODO: implement create-and-upload as a single command invocation
+        // #[arg(short, long)]
+        // create: bool,
         #[arg()]
         files: Vec<String>,
     },
