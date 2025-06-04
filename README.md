@@ -51,3 +51,14 @@ One of these, defaults to `help`:
 | upload-release | Uploads one-or-more files to an existing release, identified by it's tag name. |
 | help | prints the help text (the usage summary above). |
 
+## Unit Testing
+
+The unit test~~s~~ require a Gitea server to execute against. This information is supplied by environment variables rather than on the command line, but it is otherwise exactly the same usage.
+
+| Variable | Description |
+|-|-|
+| TEST_GITEA_SERVER | Server URL, match `-u`, `--url` |
+| TEST_GITEA_REPO | Owner + repo name, match `-u` `--repo` |
+| TEST_GITEA_KEY | API key, match `RELEASE_KEY_GITEA`. The use of a new variable for the API token is to help avoid accidentally touching a production environment during test execution. |
+| TEST_GITEA_RELEASE_TAG | Git tag used to identify the Release. Same as `upload-release`'s positional argument `<TAG_NAME>`. |
+
