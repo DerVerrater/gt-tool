@@ -50,47 +50,23 @@ mod tests {
 
     #[tokio::test]
     async fn attach_file_exists() {
-        let server = std::env::var("TEST_GITEA_SERVER")
-            .expect("Must set server address in env var \"TEST_GITEA_SERVER\"");
-        let repo = std::env::var("TEST_GITEA_REPO")
-            .expect("Must set <user>/<repo> name in env var \"TEST_GITEA_REPO\"");
-        let token = format!(
-            "token {}",
-            std::env::var("TEST_GITEA_KEY")
-                .expect("Must set the API token in env var \"TEST_GITEA_KEY\"")
-        );
-        let release_tag = std::env::var("TEST_GITEA_RELEASE_TAG")
-            .expect("Must set the target release tag in env var \"TEST_GITEA_RELEASE_TAG\"");
-
-        let mut headers = reqwest::header::HeaderMap::new();
-        headers.append(ACCEPT, header::HeaderValue::from_static("application/json"));
-        headers.append("Authorization", token.parse().unwrap());
-
-        let client = reqwest::Client::builder()
-            .user_agent(format!(
-                "gt-tools-autotest-agent{}",
-                env!("CARGO_PKG_VERSION")
-            ))
-            .default_headers(headers)
-            .build()
-            .expect("Failed to build reqwest::Client.");
-
+        let conf = TestConfig::new();
         let release_candidates =
             crate::api::release::list_releases(
-                &client,
-                &server,
-                &repo
+                &conf.client,
+                &conf.server,
+                &conf.repo
             )
             .await
             .expect("Failed to get releases. Pre-conditions unmet, aborting test!");
 
-        let release = match_release_by_tag(&release_tag, release_candidates)
+        let release = match_release_by_tag(&conf.release_tag, release_candidates)
             .expect("Failed to select matching release. Pre-conditions unmet, aborting test!");
         
         let api_result = super::create_release_attachment(
-            &client,
-            &server,
-            &repo,
+            &conf.client,
+            &conf.server,
+            &conf.repo,
             release.id,
             vec![String::from("Cargo.toml")],
         )
@@ -100,6 +76,49 @@ mod tests {
     #[test]
     fn attach_file_missing() {
         todo!();
+    }
+
+    struct TestConfig {
+        server: String,
+        repo: String,
+        release_tag: String,
+        client: reqwest::Client,
+    }
+
+    impl TestConfig {
+        fn new() -> Self {
+            let server = std::env::var("TEST_GITEA_SERVER")
+                .expect("Must set server address in env var \"TEST_GITEA_SERVER\"");
+            let repo = std::env::var("TEST_GITEA_REPO")
+                .expect("Must set <user>/<repo> name in env var \"TEST_GITEA_REPO\"");
+            let token = format!(
+                "token {}",
+                std::env::var("TEST_GITEA_KEY")
+                    .expect("Must set the API token in env var \"TEST_GITEA_KEY\"")
+            );
+            let release_tag = std::env::var("TEST_GITEA_RELEASE_TAG")
+                .expect("Must set the target release tag in env var \"TEST_GITEA_RELEASE_TAG\"");
+
+            let mut headers = reqwest::header::HeaderMap::new();
+            headers.append(ACCEPT, header::HeaderValue::from_static("application/json"));
+            headers.append("Authorization", token.parse().unwrap());
+
+            let client = reqwest::Client::builder()
+                .user_agent(format!(
+                    "gt-tools-autotest-agent{}",
+                    env!("CARGO_PKG_VERSION")
+                ))
+                .default_headers(headers)
+                .build()
+                .expect("Failed to build reqwest::Client.");
+
+            return Self {
+                server,
+                repo,
+                release_tag,
+                client
+            };
+        }
     }
 
     // Testing utils
