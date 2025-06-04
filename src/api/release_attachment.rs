@@ -16,8 +16,13 @@ pub async fn create_release_attachment(
 
     // Ensure all files exists before starting the uploads
     for file in &files {
-        if let Err(e) = fs::exists(file) {
-            return Err(crate::Error::NoSuchFile);
+        match fs::exists(file) {
+            Ok(true) => continue,
+            Ok(false) => return Err(crate::Error::NoSuchFile),
+            Err(e) => {
+                eprintln!("Uh oh! The file-exists check couldn't be done: {e}");
+                panic!("TODO: Deal with scenario where the file's existence cannot be checked (e.g.: no permission)");
+            },
         }
     }
 
