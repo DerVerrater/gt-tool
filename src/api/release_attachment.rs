@@ -73,9 +73,30 @@ mod tests {
         .await;
     }
 
-    #[test]
-    fn attach_file_missing() {
-        todo!();
+    #[tokio::test]
+    #[should_panic]
+    async fn attach_file_missing() {
+        let conf = TestConfig::new();
+        let release_candidates =
+            crate::api::release::list_releases(
+                &conf.client,
+                &conf.server,
+                &conf.repo
+            )
+            .await
+            .expect("Failed to get releases. Pre-conditions unmet, aborting test!");
+
+        let release = match_release_by_tag(&conf.release_tag, release_candidates)
+            .expect("Failed to select matching release. Pre-conditions unmet, aborting test!");
+        
+        let api_result = super::create_release_attachment(
+            &conf.client,
+            &conf.server,
+            &conf.repo,
+            release.id,
+            vec![String::from("./this-file-doesnt-exist")],
+        )
+        .await;
     }
 
     struct TestConfig {
