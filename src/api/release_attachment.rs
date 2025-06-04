@@ -74,7 +74,6 @@ mod tests {
     }
 
     #[tokio::test]
-    #[should_panic]
     async fn attach_file_missing() {
         let conf = TestConfig::new();
         let release_candidates =
@@ -97,6 +96,14 @@ mod tests {
             vec![String::from("./this-file-doesnt-exist")],
         )
         .await;
+        let api_err = api_result.expect_err("Received Ok(()) after uploading non-existent file. That's nonsense, the API Function is wrong.");
+        match api_err {
+            crate::Error::Placeholder => panic!("Received dummy response from the API function. Finish implementing it, stupid"),
+            crate::Error::WrappedReqwestErr(error) => panic!("Received a reqwest::Error from the API function: {error}"),
+            crate::Error::MissingAuthToken => unreachable!("Missing auth token... in a unit test that already panics without the auth token..."),
+            crate::Error::NoSuchFile => (), // test passes
+            crate::Error::ApiErrorMessage(api_error) => panic!("Received an error message from the API: {api_error:?}"),
+        }
     }
 
     struct TestConfig {
