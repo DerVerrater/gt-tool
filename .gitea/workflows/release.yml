@@ -13,14 +13,14 @@ jobs:
       - name: Build binary crate
         run: cargo build --release
       - name: Rename binary to include architecture
-        run: mv target/release/gt-tools target/release/gt-tools-${{ github.ref_name }}-$(arch)
+        run: mv target/release/gt-tool target/release/gt-tool-${{ github.ref_name }}-$(arch)
       - name: Upload the program (using itself!)
         run: >
-          target/release/gt-tools-${{ github.ref_name }}-$(arch)
+          target/release/gt-tool-${{ github.ref_name }}-$(arch)
           -u ${{ vars.DEST_GITEA }} -r ${{ vars.DEST_REPO }}
           upload-release
           "${{ github.ref_name }}"
-          target/release/gt-tools-${{ github.ref_name }}-$(arch)
+          target/release/gt-tool-${{ github.ref_name }}-$(arch)
         env:
           RELEASE_KEY_GITEA: ${{ secrets.RELEASE_KEY_GITEA }}
 ...

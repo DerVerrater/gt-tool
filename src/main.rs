@@ -1,5 +1,5 @@
-use gt_tools::cli::Args;
-use gt_tools::structs::release::{CreateReleaseOption, Release};
+use gt_tool::cli::Args;
+use gt_tool::structs::release::{CreateReleaseOption, Release};
 
 use clap::Parser;
 
@@ -7,7 +7,7 @@ use reqwest::header;
 use reqwest::header::ACCEPT;
 
 #[tokio::main]
-async fn main() -> Result<(), gt_tools::Error> {
+async fn main() -> Result<(), gt_tool::Error> {
     let args = Args::parse();
 
     let mut headers = reqwest::header::HeaderMap::new();
@@ -27,14 +27,14 @@ async fn main() -> Result<(), gt_tools::Error> {
         .build()?;
 
     match args.command {
-        gt_tools::cli::Commands::ListReleases => {
+        gt_tool::cli::Commands::ListReleases => {
             let releases =
-                gt_tools::api::release::list_releases(&client, &args.gitea_url, &args.repo).await?;
+                gt_tool::api::release::list_releases(&client, &args.gitea_url, &args.repo).await?;
             for release in releases {
                 println!("{:?}", release);
             }
         }
-        gt_tools::cli::Commands::CreateRelease {
+        gt_tool::cli::Commands::CreateRelease {
             name,
             body,
             draft,
@@ -49,7 +49,7 @@ async fn main() -> Result<(), gt_tools::Error> {
                 tag_name,
                 target_commitish,
             };
-            gt_tools::api::release::create_release(
+            gt_tool::api::release::create_release(
                 &client,
                 &args.gitea_url,
                 &args.repo,
@@ -57,7 +57,7 @@ async fn main() -> Result<(), gt_tools::Error> {
             )
             .await?;
         }
-        gt_tools::cli::Commands::UploadRelease {
+        gt_tool::cli::Commands::UploadRelease {
             tag_name,
             // create,
             files,
@@ -75,10 +75,10 @@ async fn main() -> Result<(), gt_tools::Error> {
             // Grab all, find the one that matches the input tag.
             // Scream if there are multiple matches.
             let release_candidates =
-                gt_tools::api::release::list_releases(&client, &args.gitea_url, &args.repo).await?;
+                gt_tool::api::release::list_releases(&client, &args.gitea_url, &args.repo).await?;
 
             if let Some(release) = match_release_by_tag(&tag_name, release_candidates) {
-                gt_tools::api::release_attachment::create_release_attachment(
+                gt_tool::api::release_attachment::create_release_attachment(
                     &client,
                     &args.gitea_url,
                     &args.repo,
@@ -88,7 +88,7 @@ async fn main() -> Result<(), gt_tools::Error> {
                 .await?;
             } else {
                 println!("ERR: Couldn't find a release matching the tag \"{tag_name}\".");
-                return Err(gt_tools::Error::NoSuchRelease);
+                return Err(gt_tool::Error::NoSuchRelease);
             }
         }
     }
