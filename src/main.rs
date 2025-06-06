@@ -88,6 +88,7 @@ async fn main() -> Result<(), gt_tools::Error> {
                 .await?;
             } else {
                 println!("ERR: Couldn't find a release matching the tag \"{tag_name}\".");
+                return Err(gt_tools::Error::NoSuchRelease);
             }
         }
     }
