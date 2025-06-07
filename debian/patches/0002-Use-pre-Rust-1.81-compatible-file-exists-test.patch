@@ -1,0 +1,31 @@
+From: Robert Garrett <robertgarrett404@gmail.com>
+Date: Sun, 1 Jun 2025 18:01:21 -0500
+Subject: Use pre Rust 1.81 compatible file-exists test
+
+The function `std::fs::exists(...)` was stabilized in Rust 1.81, which
+means it can't be used in the Debian Bookworm build. This patch swaps to
+a compatible implementation leaning on the std::path::Path struct.
+---
+ src/api/release_attachment.rs | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/api/release_attachment.rs b/src/api/release_attachment.rs
+index 9af71bf..8a0c798 100644
+--- a/src/api/release_attachment.rs
++++ b/src/api/release_attachment.rs
+@@ -1,4 +1,4 @@
+-use std::fs;
++use std::{fs, path};
+ 
+ pub fn check_release_match_repo() {}
+ pub fn get_release_attachment() {}
+@@ -16,7 +16,8 @@ pub async fn create_release_attachment(
+ 
+     // Ensure all files exists before starting the uploads
+     for file in &files {
+-        match fs::exists(file) {
++        let path = path::Path::new(file);
++        match path.try_exists() {
+             Ok(true) => continue,
+             Ok(false) => return Err(crate::Error::NoSuchFile),
+             Err(e) => {
