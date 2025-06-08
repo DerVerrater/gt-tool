@@ -1,9 +1,7 @@
-use serde::{Deserialize, Serialize};
 
 use crate::{
     ApiError, Result,
     structs::{
-        self,
         release::{CreateReleaseOption, Release},
     },
 };
