@@ -23,15 +23,26 @@ pub async fn list_releases(
     let request_url = format!("{gitea_url}/api/v1/repos/{repo}/releases/");
     let req = client.get(request_url).send().await;
     let response = req.map_err(|reqwest_err| crate::Error::WrappedReqwestErr(reqwest_err))?;
-    let release_list = response
-        .json::<Vec<Release>>()
-        .await
-        .map_err(|reqwest_err| {
-            // Convert reqwest errors to my own
-            // TODO: Create all error variants (see lib.rs)
-            crate::Error::WrappedReqwestErr(reqwest_err)
-        })?;
-    return Ok(release_list);
+    if response.status().is_success() {
+        let release_list = response
+            .json::<Vec<Release>>()
+            .await
+            .map_err(|reqwest_err| {
+                // Convert reqwest errors to my own
+                // TODO: Create all error variants (see lib.rs)
+                crate::Error::WrappedReqwestErr(reqwest_err)
+            })?;
+        return Ok(release_list);
+    } else if response.status().is_client_error() {
+        let mesg = response
+            .json::<ApiError>()
+            .await
+            .map_err(|reqwest_err| {
+                crate::Error::WrappedReqwestErr(reqwest_err)
+            })?;
+        return Err(crate::Error::ApiErrorMessage(mesg));
+    }
+    panic!("Reached end of list_releases without matching a return pathway.");
 }
 
 #[derive(Debug, Deserialize, Serialize)]
