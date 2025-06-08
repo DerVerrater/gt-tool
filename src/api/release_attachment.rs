@@ -1,6 +1,6 @@
 use std::fs;
 
-use crate::ApiError;
+use crate::structs::Attachment;
 
 pub fn check_release_match_repo() {}
 pub fn get_release_attachment() {}
@@ -12,44 +12,44 @@ pub async fn create_release_attachment(
     gitea_url: &str,
     repo: &str,
     release_id: usize,
-    files: Vec<String>,
-) -> crate::Result<()> {
+    file: String,
+) -> crate::Result<Attachment> {
     let request_url = format!("{gitea_url}/api/v1/repos/{repo}/releases/{release_id}/assets");
 
-    // Ensure all files exists before starting the uploads
-    for file in &files {
-        match fs::exists(file) {
-            Ok(true) => continue,
-            Ok(false) => return Err(crate::Error::NoSuchFile),
-            Err(e) => {
-                eprintln!("Uh oh! The file-exists check couldn't be done: {e}");
-                panic!("TODO: Deal with scenario where the file's existence cannot be checked (e.g.: no permission)");
-            },
-        }
+    match fs::exists(&file) {
+        Ok(true) => (),
+        Ok(false) => return Err(crate::Error::NoSuchFile),
+        Err(e) => {
+            eprintln!("Uh oh! The file-exists check couldn't be done: {e}");
+            panic!("TODO: Deal with scenario where the file's existence cannot be checked (e.g.: no permission)");
+        },
     }
 
-    for file in files {
-        println!("Uploading file {}", &file);
-        let data = reqwest::multipart::Part::stream(fs::read(&file).unwrap())
-            .file_name("attachment")
-            .mime_str("text/plain")?;
+    println!("Uploading file {}", &file);
+    let data = reqwest::multipart::Part::stream(fs::read(&file).unwrap())
+        .file_name("attachment")
+        .mime_str("text/plain")?;
 
-        let form = reqwest::multipart::Form::new().part("attachment", data);
+    let form = reqwest::multipart::Form::new().part("attachment", data);
 
-        let response = client
-            .post(&request_url)
-            .multipart(form)
-            .query(&[("name", file.split("/").last())])
-            .send()
-            .await?;
-        if response.status().is_success() {
-            // TODO: create a struct Attachment and return it to the caller.
-        } else if response.status().is_client_error() {
-            let mesg = crate::decode_client_error(response).await?;
-            return Err(crate::Error::ApiErrorMessage(mesg));
-        }
+    let response = client
+        .post(&request_url)
+        .multipart(form)
+        .query(&[("name", file.split("/").last())])
+        .send()
+        .await?;
+    if response.status().is_success() {
+        // TODO: create a struct Attachment and return it to the caller.
+        let attachment_desc = response
+            .json::<Attachment>()
+            .await
+            .map_err(|e| crate::Error::from(e))?;
+        return Ok(attachment_desc);
+    } else if response.status().is_client_error() {
+        let mesg = crate::decode_client_error(response).await?;
+        return Err(crate::Error::ApiErrorMessage(mesg));
     }
-    Ok(())
+    panic!("Reached end of release_attachment without matching a return path");
 }
 pub fn edit_release_attachment() {}
 pub fn delete_release_attachment() {}
