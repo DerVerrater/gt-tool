@@ -1,5 +1,7 @@
 use std::fs;
 
+use crate::ApiError;
+
 pub fn check_release_match_repo() {}
 pub fn get_release_attachment() {}
 pub fn list_release_attachments() {
@@ -34,12 +36,23 @@ pub async fn create_release_attachment(
 
         let form = reqwest::multipart::Form::new().part("attachment", data);
 
-        let request = client
+        let response = client
             .post(&request_url)
             .multipart(form)
             .query(&[("name", file.split("/").last())])
             .send()
             .await?;
+        if response.status().is_success() {
+            // TODO: create a struct Attachment and return it to the caller.
+        } else if response.status().is_client_error() {
+            let mesg = response
+                .json::<ApiError>()
+                .await
+                .map_err(|reqwest_err| {
+                    crate::Error::WrappedReqwestErr(reqwest_err)
+                })?;
+            return Err(crate::Error::ApiErrorMessage(mesg));
+        }
     }
     Ok(())
 }
