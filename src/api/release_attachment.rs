@@ -45,12 +45,7 @@ pub async fn create_release_attachment(
         if response.status().is_success() {
             // TODO: create a struct Attachment and return it to the caller.
         } else if response.status().is_client_error() {
-            let mesg = response
-                .json::<ApiError>()
-                .await
-                .map_err(|reqwest_err| {
-                    crate::Error::WrappedReqwestErr(reqwest_err)
-                })?;
+            let mesg = crate::decode_client_error(response).await?;
             return Err(crate::Error::ApiErrorMessage(mesg));
         }
     }

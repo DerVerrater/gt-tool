@@ -10,6 +10,15 @@ pub struct ApiError {
     url: String,
 }
 
+pub (crate) async fn decode_client_error(response: reqwest::Response) -> Result<ApiError> {
+    response
+        .json::<ApiError>()
+        .await
+        .map_err(|reqwest_err| {
+            crate::Error::WrappedReqwestErr(reqwest_err)
+        })
+}
+
 #[derive(Debug)]
 pub enum Error {
     Placeholder, // TODO: Enumerate error modes

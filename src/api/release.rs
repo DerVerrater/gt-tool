@@ -32,12 +32,7 @@ pub async fn list_releases(
             })?;
         return Ok(release_list);
     } else if response.status().is_client_error() {
-        let mesg = response
-            .json::<ApiError>()
-            .await
-            .map_err(|reqwest_err| {
-                crate::Error::WrappedReqwestErr(reqwest_err)
-            })?;
+        let mesg = crate::decode_client_error(response).await?;
         return Err(crate::Error::ApiErrorMessage(mesg));
     }
     panic!("Reached end of list_releases without matching a return pathway.");
@@ -63,12 +58,7 @@ pub async fn create_release(
             .map_err(|e| crate::Error::from(e))?;
         return Ok(new_release);
     } else if response.status().is_client_error() {
-        let mesg = response
-            .json::<ApiError>()
-            .await
-            .map_err(|reqwest_err| {
-                crate::Error::WrappedReqwestErr(reqwest_err)
-            })?;
+        let mesg = crate::decode_client_error(response).await?;
         return Err(crate::Error::ApiErrorMessage(mesg))
     }
     panic!("Reached end of create_release without matching a return path");
