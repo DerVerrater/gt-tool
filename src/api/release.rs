@@ -1,6 +1,6 @@
 
 use crate::{
-    ApiError, Result,
+    Result,
     structs::{
         release::{CreateReleaseOption, Release},
     },
