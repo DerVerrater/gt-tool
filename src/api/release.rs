@@ -45,14 +45,6 @@ pub async fn list_releases(
     panic!("Reached end of list_releases without matching a return pathway.");
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-#[serde(untagged)]
-enum CreateResult {
-    Success(structs::release::Release),
-    ErrWithMessage(ApiError),
-    Empty,
-}
-
 pub async fn create_release(
     client: &reqwest::Client,
     gitea_url: &str,
@@ -60,27 +52,28 @@ pub async fn create_release(
     submission: CreateReleaseOption,
 ) -> Result<Release> {
     let request_url = format!("{gitea_url}/api/v1/repos/{repo}/releases");
-    let req = client
+    let response = client
         .post(request_url)
         .json(&submission)
         .send()
         .await
         .map_err(|e| crate::Error::from(e))?;
-    let new_release = req
-        .json::<CreateResult>()
-        .await
-        .map_err(|e| crate::Error::from(e))?;
-    match new_release {
-        CreateResult::Success(release) => Ok(release),
-        CreateResult::ErrWithMessage(api_error) => {
-            if api_error.message == "token is required" {
-                Err(crate::Error::MissingAuthToken)
-            } else {
-                Err(crate::Error::ApiErrorMessage(api_error))
-            }
-        }
-        CreateResult::Empty => panic!("How can we have 200 OK and no release info? No. Crash"),
+    if response.status().is_success() {
+        let new_release = response
+            .json::<Release>()
+            .await
+            .map_err(|e| crate::Error::from(e))?;
+        return Ok(new_release);
+    } else if response.status().is_client_error() {
+        let mesg = response
+            .json::<ApiError>()
+            .await
+            .map_err(|reqwest_err| {
+                crate::Error::WrappedReqwestErr(reqwest_err)
+            })?;
+        return Err(crate::Error::ApiErrorMessage(mesg))
     }
+    panic!("Reached end of create_release without matching a return path");
 }
 pub fn edit_release(id: u64) -> Result<Release> {
     todo!();
