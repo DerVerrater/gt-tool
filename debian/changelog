@@ -1,3 +1,21 @@
+gt-tool (2.0.0-1) unstable; urgency=medium
+
+  * Interrogate list_releases result more closely
+  * Interrogate create_release result more closely
+  * Drop unused imports
+  * "Fix" the test case
+  * Interrogate create_release_attachment result
+  * Fold client-error-decode into a util function
+  * Add `Attachment` struct, new iface for create-rel
+  * Update main.rs to use new attachment iface
+  * Delete the unit tests
+  * ... and the unit testing notes in README.md
+  * Drop unused import in api/release.rs
+  * Use pre Rust 1.81 compatible file-exists test
+  * Rediff patches
+
+ -- Robert Garrett <robertgarrett404@gmail.com>  Thu, 12 Jun 2025 16:28:18 -0500
+
 gt-tool (1.0.0-1) unstable; urgency=low
 
   * Experimental release.
