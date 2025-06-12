@@ -1,3 +1,6 @@
+
+use std::path;
+
 use gt_tool::cli::Args;
 use gt_tool::structs::release::{CreateReleaseOption, Release};
 
@@ -78,14 +81,27 @@ async fn main() -> Result<(), gt_tool::Error> {
                 gt_tool::api::release::list_releases(&client, &args.gitea_url, &args.repo).await?;
 
             if let Some(release) = match_release_by_tag(&tag_name, release_candidates) {
-                gt_tool::api::release_attachment::create_release_attachment(
-                    &client,
-                    &args.gitea_url,
-                    &args.repo,
-                    release.id,
-                    files,
-                )
-                .await?;
+                for file in &files {
+                    let path = path::Path::new(&file);
+                    match path.try_exists() {
+                        Ok(true) => continue,
+                        Ok(false) => return Err(gt_tool::Error::NoSuchFile),
+                        Err(e) => {
+                            eprintln!("Uh oh! The file-exists check couldn't be done: {e}");
+                            panic!("TODO: Deal with scenario where the file's existence cannot be checked (e.g.: no permission)");
+                        },
+                    }
+                }
+                for file in files {
+                    let _attach_desc = gt_tool::api::release_attachment::create_release_attachment(
+                        &client,
+                        &args.gitea_url,
+                        &args.repo,
+                        release.id,
+                        file,
+                    )
+                    .await?;
+                }
             } else {
                 println!("ERR: Couldn't find a release matching the tag \"{tag_name}\".");
                 return Err(gt_tool::Error::NoSuchRelease);
