@@ -9,7 +9,7 @@ pub struct Attachment {
     name: String,
     size: i64,
     download_count: i64,
-    created: String, // TODO: Date-time struct
+    created_at: String, // TODO: Date-time struct
     uuid: String,
-    download_url: String,
+    browser_download_url: String,
 }
