@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -17,6 +19,31 @@ pub struct Release {
     created_at: String,
     published_at: String,
     author: Author,
+}
+
+impl Display for Release {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let body = if self.body.len() > 0 {
+            &self.body
+        } else {
+            &String::from("(empty body)")
+        };
+        write!(f,
+"Tag: {}
+Name: {}
+  {}
+Published: {} (created: {})
+Author: {} ({})
+",
+            self.tag_name,
+            self.name,
+            body,
+            self.published_at,
+            self.created_at,
+            self.author.login,
+            self.author.email,
+        )
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize)]

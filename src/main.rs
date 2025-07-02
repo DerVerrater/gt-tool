@@ -34,7 +34,7 @@ async fn main() -> Result<(), gt_tool::Error> {
             let releases =
                 gt_tool::api::release::list_releases(&client, &args.gitea_url, &args.repo).await?;
             for release in releases {
-                println!("{:?}", release);
+                println!("{}", release);
             }
         }
         gt_tool::cli::Commands::CreateRelease {
