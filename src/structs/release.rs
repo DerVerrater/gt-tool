@@ -1,4 +1,3 @@
-
 use colored::Colorize;
 use serde::{Deserialize, Serialize};
 
@@ -35,7 +34,7 @@ impl Release {
         };
 
         format!(
-"{tag} {}
+            "{tag} {}
 {name} {}
   {}
 {published} {} ({created} {})

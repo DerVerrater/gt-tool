@@ -22,8 +22,10 @@ pub async fn create_release_attachment(
         Ok(false) => return Err(crate::Error::NoSuchFile),
         Err(e) => {
             eprintln!("Uh oh! The file-exists check couldn't be done: {e}");
-            panic!("TODO: Deal with scenario where the file's existence cannot be checked (e.g.: no permission)");
-        },
+            panic!(
+                "TODO: Deal with scenario where the file's existence cannot be checked (e.g.: no permission)"
+            );
+        }
     }
 
     println!("Uploading file {}", &file);
@@ -44,7 +46,7 @@ pub async fn create_release_attachment(
         let attachment_desc = response
             .json::<Attachment>()
             .await
-            .map_err( crate::Error::from)?;
+            .map_err(crate::Error::from)?;
         return Ok(attachment_desc);
     } else if response.status().is_client_error() {
         let mesg = crate::decode_client_error(response).await?;

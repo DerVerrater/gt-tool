@@ -1,9 +1,6 @@
-
 use crate::{
     Result,
-    structs::{
-        release::{CreateReleaseOption, Release},
-    },
+    structs::release::{CreateReleaseOption, Release},
 };
 
 pub fn get_release(_id: u64) -> Result<Release> {
@@ -59,7 +56,7 @@ pub async fn create_release(
         return Ok(new_release);
     } else if response.status().is_client_error() {
         let mesg = crate::decode_client_error(response).await?;
-        return Err(crate::Error::ApiErrorMessage(mesg))
+        return Err(crate::Error::ApiErrorMessage(mesg));
     }
     panic!("Reached end of create_release without matching a return path");
 }
