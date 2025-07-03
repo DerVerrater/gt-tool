@@ -33,7 +33,10 @@ async fn main() -> Result<(), gt_tool::Error> {
         gt_tool::cli::Commands::ListReleases => {
             let releases =
                 gt_tool::api::release::list_releases(&client, &args.gitea_url, &args.repo).await?;
-            for release in releases {
+            // Print in reverse order so the newest items are closest to the
+            // user's command prompt. Otherwise the newest item scrolls off the
+            // screen and can't be seen.
+            for release in releases.iter().rev() {
                 println!("{}", release);
             }
         }
