@@ -6,7 +6,7 @@ use crate::{
     },
 };
 
-pub fn get_release(id: u64) -> Result<Release> {
+pub fn get_release(_id: u64) -> Result<Release> {
     todo!();
 }
 pub fn get_latest_release() -> Result<Release> {
@@ -63,9 +63,9 @@ pub async fn create_release(
     }
     panic!("Reached end of create_release without matching a return path");
 }
-pub fn edit_release(id: u64) -> Result<Release> {
+pub fn edit_release(_id: u64) -> Result<Release> {
     todo!();
 }
-pub fn delete_release(id: u64) -> Result<()> {
+pub fn delete_release(_id: u64) -> Result<()> {
     todo!();
 }
