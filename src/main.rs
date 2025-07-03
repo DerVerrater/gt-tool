@@ -6,7 +6,6 @@ use gt_tool::structs::release::{CreateReleaseOption, Release};
 
 use clap::Parser;
 
-use itertools::Itertools;
 use reqwest::header;
 use reqwest::header::ACCEPT;
 
@@ -37,11 +36,13 @@ async fn main() -> Result<(), gt_tool::Error> {
             // Print in reverse order so the newest items are closest to the
             // user's command prompt. Otherwise the newest item scrolls off the
             // screen and can't be seen.
-            let _ = releases
-                .iter()
-                .rev()
-                .map(|release| release.to_string())
-                .intersperse(String::from(""))
+            let _ = itertools::Itertools::intersperse(
+                releases
+                    .iter()
+                    .rev()
+                    .map(|release| release.to_string()),
+                    String::from("")
+                )
                 .map(|release| println!("{}", release))
                 .fold((), |_, _| () );
         }
