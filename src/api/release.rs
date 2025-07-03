@@ -20,7 +20,7 @@ pub async fn list_releases(
 ) -> Result<Vec<Release>> {
     let request_url = format!("{gitea_url}/api/v1/repos/{repo}/releases/");
     let req = client.get(request_url).send().await;
-    let response = req.map_err(|reqwest_err| crate::Error::WrappedReqwestErr(reqwest_err))?;
+    let response = req.map_err(crate::Error::WrappedReqwestErr)?;
     if response.status().is_success() {
         let release_list = response
             .json::<Vec<Release>>()
@@ -50,12 +50,12 @@ pub async fn create_release(
         .json(&submission)
         .send()
         .await
-        .map_err(|e| crate::Error::from(e))?;
+        .map_err(crate::Error::from)?;
     if response.status().is_success() {
         let new_release = response
             .json::<Release>()
             .await
-            .map_err(|e| crate::Error::from(e))?;
+            .map_err(crate::Error::from)?;
         return Ok(new_release);
     } else if response.status().is_client_error() {
         let mesg = crate::decode_client_error(response).await?;

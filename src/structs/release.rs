@@ -28,7 +28,7 @@ impl Release {
         let published = "Published:".bright_green();
         let created = "Created:".green().dimmed();
         let author = "Author:".blue();
-        let body = if self.body.len() > 0 {
+        let body = if !self.body.is_empty() {
             &self.body.white()
         } else {
             &String::from("(empty body)").dimmed()

@@ -36,7 +36,7 @@ async fn main() -> Result<(), gt_tool::Error> {
             // Print in reverse order so the newest items are closest to the
             // user's command prompt. Otherwise the newest item scrolls off the
             // screen and can't be seen.
-            let _ = itertools::Itertools::intersperse(
+            itertools::Itertools::intersperse(
                 releases
                     .iter()
                     .rev()
@@ -152,5 +152,5 @@ fn match_release_by_tag(tag: &String, releases: Vec<Release>) -> Option<Release>
             }
         }
     }
-    return release;
+    release
 }

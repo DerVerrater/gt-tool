@@ -44,7 +44,7 @@ pub async fn create_release_attachment(
         let attachment_desc = response
             .json::<Attachment>()
             .await
-            .map_err(|e| crate::Error::from(e))?;
+            .map_err( crate::Error::from)?;
         return Ok(attachment_desc);
     } else if response.status().is_client_error() {
         let mesg = crate::decode_client_error(response).await?;
