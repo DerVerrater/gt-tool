@@ -40,8 +40,7 @@ impl Display for Release {
 {name} {}
   {}
 {published} {} ({created} {})
-{author} {} ({})
-",
+{author} {} ({})",
             self.tag_name.bold(),
             self.name,
             body,
