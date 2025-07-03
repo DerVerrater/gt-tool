@@ -40,7 +40,7 @@ async fn main() -> Result<(), gt_tool::Error> {
                 releases
                     .iter()
                     .rev()
-                    .map(|release| release.to_string()),
+                    .map(|release| release.colorized()),
                     String::from("")
                 )
                 .map(|release| println!("{}", release))

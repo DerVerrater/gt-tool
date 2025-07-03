@@ -1,4 +1,3 @@
-use std::fmt::Display;
 
 use colored::Colorize;
 use serde::{Deserialize, Serialize};
@@ -22,8 +21,8 @@ pub struct Release {
     author: Author,
 }
 
-impl Display for Release {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl Release {
+    pub fn colorized(&self) -> String {
         let tag = "Tag:".green().bold();
         let name = "Name:".green();
         let published = "Published:".bright_green();
@@ -35,7 +34,7 @@ impl Display for Release {
             &String::from("(empty body)").dimmed()
         };
 
-        write!(f,
+        format!(
 "{tag} {}
 {name} {}
   {}
