@@ -7,6 +7,8 @@ Build-Depends:
  debhelper-compat (= 13),
  dh-cargo,
  librust-clap-dev,
+ librust-colored-dev,
+ librust-itertools-dev,
  librust-reqwest-dev,
  librust-tokio-dev,
  librust-serde-dev,
