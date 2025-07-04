@@ -1,3 +1,22 @@
+gt-tool (2.2.0-1) unstable; urgency=medium
+
+  * Basic impl Display for the Release struct
+  * Print releases in reverse order for easier reading
+  * Colorize the output!
+  * Remove trailing newline in Release item printout
+  * Galaxy-brained newline intersperse function
+  * Change to free-fn intersperse for stdlib compat
+  * `Release.colorized()`, not std::fmt::Display
+  * Address most of the cargo-clippy lints
+  * Prefix unused variables to quiet the linter
+  * Autoformat
+  * Oops, missed one
+  * Bump to v2.2.0
+  * Lift the empty-body string outside the let-if
+  * Add the new dependencies to debian/control
+
+ -- Robert Garrett <robertgarrett404@gmail.com>  Fri, 04 Jul 2025 10:10:54 -0500
+
 gt-tool (2.1.0-1) unstable; urgency=medium
 
   * Fix: incorrect field names for `Attachment`
