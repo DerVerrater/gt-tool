@@ -1,3 +1,4 @@
+use colored::Colorize;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -17,6 +18,36 @@ pub struct Release {
     created_at: String,
     published_at: String,
     author: Author,
+}
+
+impl Release {
+    pub fn colorized(&self) -> String {
+        let tag = "Tag:".green().bold();
+        let name = "Name:".green();
+        let published = "Published:".bright_green();
+        let created = "Created:".green().dimmed();
+        let author = "Author:".blue();
+        let body = if !self.body.is_empty() {
+            &self.body.white()
+        } else {
+            &String::from("(empty body)").dimmed()
+        };
+
+        format!(
+            "{tag} {}
+{name} {}
+  {}
+{published} {} ({created} {})
+{author} {} ({})",
+            self.tag_name.bold(),
+            self.name,
+            body,
+            self.published_at,
+            self.created_at.dimmed(),
+            self.author.login,
+            self.author.email,
+        )
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize)]

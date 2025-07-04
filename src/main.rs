@@ -1,4 +1,3 @@
-
 use std::path;
 
 use gt_tool::cli::Args;
@@ -22,10 +21,7 @@ async fn main() -> Result<(), gt_tool::Error> {
         headers.append("Authorization", token.parse().unwrap());
     }
     let client = reqwest::Client::builder()
-        .user_agent(format!(
-            "gt-tools-agent-{}",
-            env!("CARGO_PKG_VERSION")
-        ))
+        .user_agent(format!("gt-tools-agent-{}", env!("CARGO_PKG_VERSION")))
         .default_headers(headers)
         .build()?;
 
@@ -33,9 +29,15 @@ async fn main() -> Result<(), gt_tool::Error> {
         gt_tool::cli::Commands::ListReleases => {
             let releases =
                 gt_tool::api::release::list_releases(&client, &args.gitea_url, &args.repo).await?;
-            for release in releases {
-                println!("{:?}", release);
-            }
+            // Print in reverse order so the newest items are closest to the
+            // user's command prompt. Otherwise the newest item scrolls off the
+            // screen and can't be seen.
+            itertools::Itertools::intersperse(
+                releases.iter().rev().map(|release| release.colorized()),
+                String::from(""),
+            )
+            .map(|release| println!("{}", release))
+            .fold((), |_, _| ());
         }
         gt_tool::cli::Commands::CreateRelease {
             name,
@@ -52,13 +54,8 @@ async fn main() -> Result<(), gt_tool::Error> {
                 tag_name,
                 target_commitish,
             };
-            gt_tool::api::release::create_release(
-                &client,
-                &args.gitea_url,
-                &args.repo,
-                submission,
-            )
-            .await?;
+            gt_tool::api::release::create_release(&client, &args.gitea_url, &args.repo, submission)
+                .await?;
         }
         gt_tool::cli::Commands::UploadRelease {
             tag_name,
@@ -88,8 +85,10 @@ async fn main() -> Result<(), gt_tool::Error> {
                         Ok(false) => return Err(gt_tool::Error::NoSuchFile),
                         Err(e) => {
                             eprintln!("Uh oh! The file-exists check couldn't be done: {e}");
-                            panic!("TODO: Deal with scenario where the file's existence cannot be checked (e.g.: no permission)");
-                        },
+                            panic!(
+                                "TODO: Deal with scenario where the file's existence cannot be checked (e.g.: no permission)"
+                            );
+                        }
                     }
                 }
                 for file in files {
@@ -143,5 +142,5 @@ fn match_release_by_tag(tag: &String, releases: Vec<Release>) -> Option<Release>
             }
         }
     }
-    return release;
+    release
 }
