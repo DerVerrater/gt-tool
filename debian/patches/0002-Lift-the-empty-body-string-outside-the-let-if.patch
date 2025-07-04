@@ -1,0 +1,39 @@
+From: Robert Garrett <robertgarrett404@gmail.com>
+Date: Fri, 4 Jul 2025 09:36:52 -0500
+Subject: Lift the empty-body string outside the let-if
+
+The if-else block that selects between the body of the Release or a
+placeholder is returning references to variables that only exist
+*inside* the body of the if-else blocks. Newer Rust versions seem to
+understand the intent and do The Right Thing anyway (or they have some
+other rule for how if-else block scopes work).
+
+Manually lifting the variable to an outer scope resolves the problem.
+---
+ src/structs/release.rs | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/src/structs/release.rs b/src/structs/release.rs
+index 9ed537e..3c4a434 100644
+--- a/src/structs/release.rs
++++ b/src/structs/release.rs
+@@ -1,3 +1,5 @@
++use std::io::empty;
++
+ use colored::Colorize;
+ use serde::{Deserialize, Serialize};
+ 
+@@ -27,10 +29,11 @@ impl Release {
+         let published = "Published:".bright_green();
+         let created = "Created:".green().dimmed();
+         let author = "Author:".blue();
++        let empty_body = String::from("(empty body)").dimmed();
+         let body = if !self.body.is_empty() {
+-            &self.body.white()
++            self.body.white()
+         } else {
+-            &String::from("(empty body)").dimmed()
++            empty_body
+         };
+ 
+         format!(

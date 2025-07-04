@@ -2,20 +2,20 @@ From: Robert Garrett <robertgarrett404@gmail.com>
 Date: Sun, 1 Jun 2025 17:59:20 -0500
 Subject: Rust edition downgrade to 2021
 
-Debian Bookworm uses Rust 1.64 which only supports up to the 2021
+Debian Bookworm uses Rust 1.63 which only supports up to the 2021
 edition.
 ---
  Cargo.toml | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Cargo.toml b/Cargo.toml
-index febccc4..cf52754 100644
+index 4fd569c..8b67a52 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -1,7 +1,7 @@
  [package]
  name = "gt-tool"
- version = "1.0.0"
+ version = "2.2.0"
 -edition = "2024"
 +edition = "2021"
  
