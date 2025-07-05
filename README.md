@@ -1,4 +1,4 @@
-# gt-tools
+# gt-tool
 
 CLI tools for interacting with the Gitea API. Use interactively to talk to your Gitea instance, or automatically via a CI/CD pipeline.
 
