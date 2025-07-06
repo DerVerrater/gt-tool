@@ -8,6 +8,11 @@ jobs:
     name: Compile and upload a release build
     steps:
       - uses: actions/checkout@v4
+      - name: Get Cargo version
+        run: echo "cargo_version=v$(grep "^version" Cargo.toml | cut -d \" -f2)" >> $GITHUB_ENV
+      - name: Abort if Cargo.toml & Git Tag versions don't match
+        if: ${{ env.cargo_version != github.ref_name }}
+        run: exit 1
       - name: Install Rust Stable
         uses: dtolnay/rust-toolchain@stable
       - name: Build binary crate
