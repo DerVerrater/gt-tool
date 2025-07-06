@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 
 pub mod api;
 pub mod cli;
+pub mod config;
 pub mod structs;
 
 #[derive(Debug, Deserialize, Serialize)]
