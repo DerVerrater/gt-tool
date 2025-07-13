@@ -17,7 +17,7 @@ Copyright:
  2025 Robert Garrett <robertgarrett404@gmail.com>
 License: GPL-3+
 Comment:
- The debian/rules file is liften directly from the tuigreet package. It was
+ The debian/rules file is lifted directly from the tuigreet package. It was
  linked in the Debian Rust Team Book as a pretty simple example package. The
  only change I've made is to remove the documentation generation target.
  .
