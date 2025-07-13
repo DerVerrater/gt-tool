@@ -1,7 +1,7 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: gt-tools
 Upstream-Contact: Robert Garrett <robertgarrett404@gmail.com>
-Source: https://source.mnt.re/reform/mnt-reform-setup-wizard
+Source: https://git.gelvin.dev/robert/gt-tool
 
 Files: *
 Copyright: 2025 Robert Garrett <robertgarrett404@gmail.com>
