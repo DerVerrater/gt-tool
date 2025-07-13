@@ -1,3 +1,10 @@
+gt-tool (2.2.0-2) unstable; urgency=medium
+
+  * Fix: "Source:" URL in debian/copyright
+  * Fix typo in copyright comment
+
+ -- Robert Garrett <robertgarrett404@gmail.com>  Sun, 13 Jul 2025 16:59:25 -0500
+
 gt-tool (2.2.0-1) unstable; urgency=medium
 
   * Basic impl Display for the Release struct
