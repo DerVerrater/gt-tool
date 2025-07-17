@@ -35,6 +35,23 @@ fn get_table<'outer>(outer: &'outer Table, table_name: impl ToString) -> Result<
         .ok_or(Error::BadFormat)?)
 }
 
+
+/// Similar to `get_property()` but maps the "Error::NoSuchProperty" result to
+/// Option::None. Some properties aren't specified, and that's okay... sometimes.
+fn get_maybe_property<'outer> (outer: &'outer Table, property: impl ToString) -> Result<Option<&'outer String>> {
+    let maybe_prop = get_property(outer, property);
+    match maybe_prop {
+        Ok(value) => Ok(Some(value)),
+        Err(e) => {
+            if let Error::NoSuchProperty = e {
+                return Ok(None);
+            } else {
+                return Err(e);
+            }
+        }
+    }
+}
+
 /// The config properties are individual strings. This gets the named property,
 /// or an error explaining why it couldn't be fetched.
 fn get_property<'outer>(outer: &'outer Table, property: impl ToString) -> Result<&'outer String> {
