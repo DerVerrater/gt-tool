@@ -145,6 +145,43 @@ mod tests {
 
     use super::*;
 
+    // Util for generating a reference struct
+    fn gen_expected_struct() -> WholeFile {
+        WholeFile {
+            all: PartialConfig {
+                project_path: None,
+                gitea_url: Some(String::from("http://localhost:3000")),
+                owner: None,
+                repo: None,
+                token: Some(String::from("fake-token"))
+            },
+            project_overrides: vec![
+                PartialConfig {
+                    project_path: Some(String::from("/home/robert/projects/gt-tool")),
+                    gitea_url: None,
+                    owner: Some(String::from("robert")),
+                    repo: Some(String::from("gt-tool")),
+                    token: None,
+                },
+                PartialConfig {
+                    project_path: Some(String::from("/home/robert/projects/rcalc")),
+                    gitea_url: None,
+                    owner: Some(String::from("jamis")),
+                    repo: Some(String::from("rcalc")),
+                    token: None,
+                },
+                PartialConfig {
+                    project_path: Some(String::from("/home/robert/projects/rcalc-builders")),
+                    gitea_url: None,
+                    owner: Some(String::from("jamis")),
+                    repo: Some(String::from("rcalc")),
+                    token: None,
+                },
+            
+            ],
+        }
+    }
+
     #[test]
     fn read_single_prop() -> Result<()> {
         let fx_input_str = "owner = \"dingus\"";
@@ -185,56 +222,8 @@ mod tests {
 
     #[test]
     fn read_config_string_ok() -> Result<()> {
-        let fx_sample_config_string = "
-[all]
-gitea_url = \"http://localhost:3000\"
-token = \"fake-token\"
-
-[\"/home/robert/projects/gt-tool\"]
-owner = \"robert\"
-repo = \"gt-tool\"
-
-[\"/home/robert/projects/rcalc\"]
-owner = \"jamis\"
-repo = \"rcalc\"
-
-[\"/home/robert/projects/rcalc-builders\"]
-owner = \"jamis\"
-repo = \"rcalc\"
-";
-        let fx_expected_struct = WholeFile {
-            all: PartialConfig {
-                project_path: None,
-                gitea_url: Some(String::from("http://localhost:3000")),
-                owner: None,
-                repo: None,
-                token: Some(String::from("fake-token"))
-            },
-            project_overrides: vec![
-                PartialConfig {
-                    project_path: Some(String::from("/home/robert/projects/gt-tool")),
-                    gitea_url: None,
-                    owner: Some(String::from("robert")),
-                    repo: Some(String::from("gt-tool")),
-                    token: None,
-                },
-                PartialConfig {
-                    project_path: Some(String::from("/home/robert/projects/rcalc")),
-                    gitea_url: None,
-                    owner: Some(String::from("jamis")),
-                    repo: Some(String::from("rcalc")),
-                    token: None,
-                },
-                PartialConfig {
-                    project_path: Some(String::from("/home/robert/projects/rcalc-builders")),
-                    gitea_url: None,
-                    owner: Some(String::from("jamis")),
-                    repo: Some(String::from("rcalc")),
-                    token: None,
-                },
-            
-            ],
-        };
+        let fx_sample_config_string = include_str!("../test_data/sample_config.toml");
+        let fx_expected_struct = gen_expected_struct();
         let conf = read_conf_str(fx_sample_config_string)?;
         println!(" ->> Test conf: {:?}", conf);
         println!(" ->> Ref  conf: {:?}", fx_expected_struct);
