@@ -98,7 +98,6 @@ fn read_conf_str(text: &str) -> Result<WholeFile> {
             .project_path(path.clone());
         whole.project_overrides.push(part_cfg);
     }
-    println!(" ->> lconf - keys {:?}", cfg_table.keys().collect::<Vec<&String>>());
     Ok(whole)
 }
 
@@ -225,8 +224,6 @@ mod tests {
         let fx_sample_config_string = include_str!("../test_data/sample_config.toml");
         let fx_expected_struct = gen_expected_struct();
         let conf = read_conf_str(fx_sample_config_string)?;
-        println!(" ->> Test conf: {:?}", conf);
-        println!(" ->> Ref  conf: {:?}", fx_expected_struct);
         
         assert_eq!(conf, fx_expected_struct);
         Ok(())
