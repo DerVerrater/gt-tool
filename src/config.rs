@@ -26,6 +26,24 @@ impl core::fmt::Display for Error{
 
 impl std::error::Error for Error {}
 
+#[derive(Debug, Default)]
+#[cfg_attr(test, derive(PartialEq))]
+struct PartialConfig {
+    project_path: Option<String>,
+    gitea_url: Option<String>,
+    owner: Option<String>,
+    repo: Option<String>,
+    token: Option<String>,
+}
+
+#[derive(Debug, Default)]
+#[cfg_attr(test, derive(PartialEq))]
+struct WholeFile {
+    all: PartialConfig,
+    project_overrides: Vec<PartialConfig>,
+}
+
+
 /// The outer value must be a Table so we can get the sub-table from it.
 fn get_table<'outer>(outer: &'outer Table, table_name: impl ToString) -> Result<&'outer Table> {
     Ok(outer
