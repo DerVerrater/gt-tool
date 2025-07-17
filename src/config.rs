@@ -71,7 +71,7 @@ struct WholeFile {
     project_overrides: Vec<PartialConfig>,
 }
 
-fn lconf(text: &str) -> Result<WholeFile> {
+fn read_conf_str(text: &str) -> Result<WholeFile> {
     let mut whole = WholeFile::default();
 
     let toml_val = text.parse::<Value>()?;
@@ -235,7 +235,7 @@ repo = \"rcalc\"
             
             ],
         };
-        let conf = lconf(fx_sample_config_string)?;
+        let conf = read_conf_str(fx_sample_config_string)?;
         println!(" ->> Test conf: {:?}", conf);
         println!(" ->> Ref  conf: {:?}", fx_expected_struct);
         
@@ -253,7 +253,7 @@ repo = \"rcalc\"
     #[test]
     fn read_config_string_empty() {
         let fx_sample_cfg = "";
-        let conf = lconf(fx_sample_cfg);
+        let conf = read_conf_str(fx_sample_cfg);
         assert!(conf.is_err());
     }
 }
