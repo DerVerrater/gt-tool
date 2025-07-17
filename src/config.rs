@@ -242,4 +242,18 @@ repo = \"rcalc\"
         assert_eq!(conf, fx_expected_struct);
         Ok(())
     }
+
+    /* TODO: Improve semantics around reading an empty string
+    An empty config string will result in Error::NoSuchTable when "[all]"
+    is retrieved. But this will *also* happen when other configs are present,
+    but "[all]" isn't. Do I treat these as valid configurations, using some
+    hard-coded default as the fallback? Or do I reject configs that don't have
+    an all-table?
+     */
+    #[test]
+    fn read_config_string_empty() {
+        let fx_sample_cfg = "";
+        let conf = lconf(fx_sample_cfg);
+        assert!(conf.is_err());
+    }
 }
