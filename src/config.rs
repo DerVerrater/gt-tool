@@ -8,6 +8,7 @@ pub enum Error {
     BadFormat,
     NoSuchProperty,
     NoSuchTable,
+    CouldntReadFile,
     TomlWrap(toml::de::Error),
 }
 
@@ -72,7 +73,14 @@ struct WholeFile {
 }
 
 fn load_from_file(path: &str) -> Result<WholeFile> {
-    todo!();
+    let res = std::fs::read_to_string(path);
+    match res {
+        Ok(s) => read_conf_str(s.as_str()),
+        Err(e) => {
+            eprintln!("->> file io err: {:?}", e);
+            Err(Error::CouldntReadFile)
+        }
+    }
 }
 
 fn read_conf_str(text: &str) -> Result<WholeFile> {
@@ -260,7 +268,7 @@ mod tests {
     fn load_from_file_missing() -> Result<()> {
         let res = load_from_file("test_data/doesnt_exist.toml");
         let err = res.unwrap_err();
-        assert_eq!(err, todo!("Need a new config::Error variant to indicate a missing config file"));
+        assert_eq!(err, Error::CouldntReadFile);
         Ok(())
     }
 
