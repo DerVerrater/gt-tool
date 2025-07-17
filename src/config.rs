@@ -174,7 +174,30 @@ repo = \"rcalc\"
                 repo: None,
                 token: Some(String::from("fake-token"))
             },
-            project_overrides: vec![],
+            project_overrides: vec![
+                PartialConfig {
+                    project_path: Some(String::from("/home/robert/projects/gt-tool")),
+                    gitea_url: None,
+                    owner: Some(String::from("robert")),
+                    repo: Some(String::from("gt-tool")),
+                    token: None,
+                },
+                PartialConfig {
+                    project_path: Some(String::from("/home/robert/projects/rcalc")),
+                    gitea_url: None,
+                    owner: Some(String::from("jamis")),
+                    repo: Some(String::from("rcalc")),
+                    token: None,
+                },
+                PartialConfig {
+                    project_path: Some(String::from("/home/robert/projects/rcalc-builders")),
+                    gitea_url: None,
+                    owner: Some(String::from("jamis")),
+                    repo: Some(String::from("rcalc")),
+                    token: None,
+                },
+            
+            ],
         };
         let conf = lconf(fx_sample_config_string)?;
         println!(" ->> Test conf: {:?}", conf);
