@@ -56,10 +56,13 @@ fn lconf(text: &str) -> Result<WholeFile> {
     // Get the global config out of the file
     if let Some(section_all) = cfg_table.get("all") {
     	if let Some(table_all) = section_all.as_table() {
-    		whole.all.gitea_url = get_maybe_property(&table_all, "gitea_url")?.cloned();
-    		whole.all.owner = get_maybe_property(&table_all, "owner")?.cloned();
-    		whole.all.repo = get_maybe_property(&table_all, "repo")?.cloned();
-    		whole.all.token = get_maybe_property(&table_all, "token")?.cloned();
+            whole.all = PartialConfig {
+                project_path: None, // There is no global project path. That's nonsense.
+                gitea_url: get_maybe_property(&table_all, "gitea_url")?.cloned(),
+                owner: get_maybe_property(&table_all, "owner")?.cloned(),
+                repo: get_maybe_property(&table_all, "repo")?.cloned(),
+                token: get_maybe_property(&table_all, "token")?.cloned(),
+            };
     	}
     }
 
