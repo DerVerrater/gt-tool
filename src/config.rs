@@ -62,7 +62,26 @@ fn lconf(text: &str) -> Result<WholeFile> {
     		whole.all.token = get_maybe_property(&table_all, "token")?.cloned();
     	}
     }
- 
+
+    // Loop over the per-project configs, if any.
+    let per_project_keys = cfg_table
+        .keys()
+        .filter(|s| { // Discard the "[all]" table
+            *s != "all"
+        });
+
+    for path in per_project_keys {
+        let tab = get_table(cfg_table, path)?;
+        let part_cfg = PartialConfig {
+            project_path: Some(path.clone()),
+            gitea_url: get_maybe_property(&tab, "gitea_url")?.cloned(),
+            owner: get_maybe_property(&tab, "owner")?.cloned(),
+            repo: get_maybe_property(&tab, "repo")?.cloned(),
+            token: get_maybe_property(&tab, "token")?.cloned(),
+        };
+        whole.project_overrides.push(part_cfg);
+    }
+    println!(" ->> lconf - keys {:?}", cfg_table.keys().collect::<Vec<&String>>());
     Ok(whole)
 }
 
