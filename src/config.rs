@@ -54,17 +54,14 @@ fn lconf(text: &str) -> Result<WholeFile> {
     let cfg_table = toml_val.as_table().ok_or(Error::BadFormat)?;
 
     // Get the global config out of the file
-    if let Some(section_all) = cfg_table.get("all") {
-    	if let Some(table_all) = section_all.as_table() {
-            whole.all = PartialConfig {
-                project_path: None, // There is no global project path. That's nonsense.
-                gitea_url: get_maybe_property(&table_all, "gitea_url")?.cloned(),
-                owner: get_maybe_property(&table_all, "owner")?.cloned(),
-                repo: get_maybe_property(&table_all, "repo")?.cloned(),
-                token: get_maybe_property(&table_all, "token")?.cloned(),
-            };
-    	}
-    }
+    let table_all = get_table(cfg_table, "all")?;
+    whole.all = PartialConfig {
+        project_path: None, // There is no global project path. That's nonsense.
+        gitea_url: get_maybe_property(&table_all, "gitea_url")?.cloned(),
+        owner: get_maybe_property(&table_all, "owner")?.cloned(),
+        repo: get_maybe_property(&table_all, "repo")?.cloned(),
+        token: get_maybe_property(&table_all, "token")?.cloned(),
+    };
 
     // Loop over the per-project configs, if any.
     let per_project_keys = cfg_table
