@@ -43,6 +43,28 @@ struct WholeFile {
     project_overrides: Vec<PartialConfig>,
 }
 
+fn lconf(text: &str) -> Result<WholeFile> {
+    let mut whole = WholeFile::default();
+
+    let toml_val = text.parse::<Value>()?;
+
+    // The config file is one big table. If the string we decoded is
+    // some other toml::Value variant, it's not correct.
+    // Try getting it as a table, return Err(BadFormat) otherwise.
+    let cfg_table = toml_val.as_table().ok_or(Error::BadFormat)?;
+
+    // Get the global config out of the file
+    if let Some(section_all) = cfg_table.get("all") {
+    	if let Some(table_all) = section_all.as_table() {
+    		whole.all.gitea_url = get_maybe_property(&table_all, "gitea_url")?.cloned();
+    		whole.all.owner = get_maybe_property(&table_all, "owner")?.cloned();
+    		whole.all.repo = get_maybe_property(&table_all, "repo")?.cloned();
+    		whole.all.token = get_maybe_property(&table_all, "token")?.cloned();
+    	}
+    }
+ 
+    Ok(whole)
+}
 
 /// The outer value must be a Table so we can get the sub-table from it.
 fn get_table<'outer>(outer: &'outer Table, table_name: impl ToString) -> Result<&'outer Table> {
@@ -122,6 +144,43 @@ mod tests {
 
         let res = get_table(&fx_value, String::from("tab"))?;
         assert_eq!(res, &expected);
+        Ok(())
+    }
+
+    #[test]
+    fn read_config_string_ok() -> Result<()> {
+        let fx_sample_config_string = "
+[all]
+gitea_url = \"http://localhost:3000\"
+token = \"fake-token\"
+
+[\"/home/robert/projects/gt-tool\"]
+owner = \"robert\"
+repo = \"gt-tool\"
+
+[\"/home/robert/projects/rcalc\"]
+owner = \"jamis\"
+repo = \"rcalc\"
+
+[\"/home/robert/projects/rcalc-builders\"]
+owner = \"jamis\"
+repo = \"rcalc\"
+";
+        let fx_expected_struct = WholeFile {
+            all: PartialConfig {
+                project_path: None,
+                gitea_url: Some(String::from("http://localhost:3000")),
+                owner: None,
+                repo: None,
+                token: Some(String::from("fake-token"))
+            },
+            project_overrides: vec![],
+        };
+        let conf = lconf(fx_sample_config_string)?;
+        println!(" ->> Test conf: {:?}", conf);
+        println!(" ->> Ref  conf: {:?}", fx_expected_struct);
+        
+        assert_eq!(conf, fx_expected_struct);
         Ok(())
     }
 }
