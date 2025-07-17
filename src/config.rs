@@ -36,6 +36,22 @@ struct PartialConfig {
     token: Option<String>,
 }
 
+impl TryFrom<&Table> for PartialConfig {
+    type Error = crate::config::Error;
+
+    fn try_from(value: &Table) -> Result<Self> {
+        Ok(Self {
+            // can't get table name because that key is gone by this point.
+            project_path: None,
+            gitea_url: get_maybe_property(&value, "gitea_url")?.cloned(),
+            owner: get_maybe_property(&value, "owner")?.cloned(),
+            repo: get_maybe_property(&value, "repo")?.cloned(),
+            token: get_maybe_property(&value, "token")?.cloned(),
+        })
+    }
+
+}
+
 #[derive(Debug, Default)]
 #[cfg_attr(test, derive(PartialEq))]
 struct WholeFile {
@@ -55,13 +71,7 @@ fn lconf(text: &str) -> Result<WholeFile> {
 
     // Get the global config out of the file
     let table_all = get_table(cfg_table, "all")?;
-    whole.all = PartialConfig {
-        project_path: None, // There is no global project path. That's nonsense.
-        gitea_url: get_maybe_property(&table_all, "gitea_url")?.cloned(),
-        owner: get_maybe_property(&table_all, "owner")?.cloned(),
-        repo: get_maybe_property(&table_all, "repo")?.cloned(),
-        token: get_maybe_property(&table_all, "token")?.cloned(),
-    };
+    whole.all = PartialConfig::try_from(table_all)?;
 
     // Loop over the per-project configs, if any.
     let per_project_keys = cfg_table
@@ -72,12 +82,10 @@ fn lconf(text: &str) -> Result<WholeFile> {
 
     for path in per_project_keys {
         let tab = get_table(cfg_table, path)?;
+        let part_cfg = PartialConfig::try_from(tab)?;
         let part_cfg = PartialConfig {
             project_path: Some(path.clone()),
-            gitea_url: get_maybe_property(&tab, "gitea_url")?.cloned(),
-            owner: get_maybe_property(&tab, "owner")?.cloned(),
-            repo: get_maybe_property(&tab, "repo")?.cloned(),
-            token: get_maybe_property(&tab, "token")?.cloned(),
+            ..part_cfg
         };
         whole.project_overrides.push(part_cfg);
     }
