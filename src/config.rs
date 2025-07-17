@@ -27,9 +27,9 @@ impl core::fmt::Display for Error{
 impl std::error::Error for Error {}
 
 /// The outer value must be a Table so we can get the sub-table from it.
-fn get_table<'outer>(outer: &'outer Table, table_name: String) -> Result<&'outer Table> {
+fn get_table<'outer>(outer: &'outer Table, table_name: impl ToString) -> Result<&'outer Table> {
     Ok(outer
-        .get(&table_name)
+        .get(&table_name.to_string())
         .ok_or(Error::NoSuchTable)?
         .as_table()
         .ok_or(Error::BadFormat)?)
@@ -37,8 +37,8 @@ fn get_table<'outer>(outer: &'outer Table, table_name: String) -> Result<&'outer
 
 /// The config properties are individual strings. This gets the named property,
 /// or an error explaining why it couldn't be fetched.
-fn get_property<'outer>(outer: &'outer Table, property: String) -> Result<&'outer String> {
-    let maybe_prop = outer.get(&property).ok_or(Error::NoSuchProperty)?;
+fn get_property<'outer>(outer: &'outer Table, property: impl ToString) -> Result<&'outer String> {
+    let maybe_prop = outer.get(&property.to_string()).ok_or(Error::NoSuchProperty)?;
     if let Value::String(text) = maybe_prop {
         Ok(text)
     } else {
