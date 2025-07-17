@@ -36,6 +36,18 @@ struct PartialConfig {
     token: Option<String>,
 }
 
+impl PartialConfig {
+    // One lonely builder-pattern function to set the project path.
+    // This is so I can do continuation style calls instead of a bunch of
+    // successive `let conf = ...` temporaries.
+    fn project_path(self, path: impl ToString) -> Self{
+        PartialConfig {
+            project_path: Some(path.to_string()),
+            ..self
+        }
+    }
+}
+
 impl TryFrom<&Table> for PartialConfig {
     type Error = crate::config::Error;
 
@@ -82,11 +94,8 @@ fn lconf(text: &str) -> Result<WholeFile> {
 
     for path in per_project_keys {
         let tab = get_table(cfg_table, path)?;
-        let part_cfg = PartialConfig::try_from(tab)?;
-        let part_cfg = PartialConfig {
-            project_path: Some(path.clone()),
-            ..part_cfg
-        };
+        let part_cfg = PartialConfig::try_from(tab)?
+            .project_path(path.clone());
         whole.project_overrides.push(part_cfg);
     }
     println!(" ->> lconf - keys {:?}", cfg_table.keys().collect::<Vec<&String>>());
