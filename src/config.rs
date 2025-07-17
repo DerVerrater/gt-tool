@@ -71,6 +71,10 @@ struct WholeFile {
     project_overrides: Vec<PartialConfig>,
 }
 
+fn load_from_file(path: &str) -> Result<WholeFile> {
+    todo!();
+}
+
 fn read_conf_str(text: &str) -> Result<WholeFile> {
     let mut whole = WholeFile::default();
 
@@ -241,5 +245,31 @@ mod tests {
         let fx_sample_cfg = "";
         let conf = read_conf_str(fx_sample_cfg);
         assert!(conf.is_err());
+    }
+
+    #[test]
+    // File exists and has valid configuration.
+    fn load_from_file_ok() -> Result<()> {
+        let conf = load_from_file("test_data/sample_config.toml")?;
+        assert_eq!(conf, gen_expected_struct());
+        Ok(())
+    }
+
+    #[test]
+    // File does not exist.
+    fn load_from_file_missing() -> Result<()> {
+        let res = load_from_file("test_data/doesnt_exist.toml");
+        let err = res.unwrap_err();
+        assert_eq!(err, todo!("Need a new config::Error variant to indicate a missing config file"));
+        Ok(())
+    }
+
+    #[test]
+    // File exists but has garbage inside.
+    // TODO: This bumps against the same semantic issue as the todo note on
+    // the 'read_config_string_empty' test
+    fn load_from_file_bad() {
+        let res = load_from_file("test_data/missing_all_table.toml");
+        assert!(res.is_err());
     }
 }

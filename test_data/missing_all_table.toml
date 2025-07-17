@@ -1,0 +1,5 @@
+# There must be an "[all]" table or the loader will reject the config file.
+
+["/some/other/path"]
+gitea_url = "fake-url"
+
