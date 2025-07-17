@@ -26,6 +26,15 @@ impl core::fmt::Display for Error{
 
 impl std::error::Error for Error {}
 
+/// The outer value must be a Table so we can get the sub-table from it.
+fn get_table<'outer>(outer: &'outer Table, table_name: String) -> Result<&'outer Table> {
+    Ok(outer
+        .get(&table_name)
+        .ok_or(Error::NoSuchTable)?
+        .as_table()
+        .ok_or(Error::BadFormat)?)
+}
+
 /// The config properties are individual strings. This gets the named property,
 /// or an error explaining why it couldn't be fetched.
 fn get_property<'outer>(outer: &'outer Table, property: String) -> Result<&'outer String> {
@@ -39,6 +48,8 @@ fn get_property<'outer>(outer: &'outer Table, property: String) -> Result<&'oute
 
 #[cfg(test)]
 mod tests {
+    use toml::map::Map;
+
     use super::*;
 
     #[test]
@@ -63,6 +74,19 @@ mod tests {
 
         let res = get_property(&fx_value, String::from("owner"))?;
         assert_eq!(res, expected);
+        Ok(())
+    }
+
+    #[test]
+    fn read_table() -> Result<()> {
+        let fx_input_str = "[tab]\nwith_a_garbage = \"value\"";
+        let fx_value = fx_input_str.parse::<Value>()?;
+        let fx_value = fx_value.as_table().ok_or(Error::BadFormat)?;
+        let mut expected: Map<String, Value> = Map::new();
+        expected.insert(String::from("with_a_garbage"), Value::String(String::from("value")));
+
+        let res = get_table(&fx_value, String::from("tab"))?;
+        assert_eq!(res, &expected);
         Ok(())
     }
 }
