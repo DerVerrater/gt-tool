@@ -29,20 +29,26 @@ impl core::fmt::Display for Error{
 
 impl std::error::Error for Error {}
 
-/// Retrieves the configuration values for the project located at a given path.
+/// Searches through the files, `search_files`, for configuration related to a
+/// project, `project`.
 /// 
-/// Configs are read from files named "gt-tool.toml" in 
-/// - /etc
-/// - each dir in $XDG_CONFIG_DIRS.
-/// FIXME: Allow user-specified search paths.
-pub fn get_config(project: &str) -> Result<PartialConfig> {
+/// The project string is used as a map key and should match the real path of a
+/// project on disk. These are the table names for each config section.
+/// 
+/// The search files iterator must produce *files* not *folders.* For now,
+/// there is no mechanism to ensure correct usage. Files that can't be opened
+/// will quietly be skipped, so there will be no warning when one gives a
+/// folder.
+///
+/// Use `fn default_paths()` to get a reasonable (Linux) default.
+///
+/// TODO: Check for, and warn or error when given a dir.
+pub fn get_config (
+    project: &str,
+    search_files: impl Iterator<Item=PathBuf>
+) -> Result<PartialConfig> {
     /*
-     1. Find all search dirs
-        - anything in `$XDG_CONFIG_DIRS` and the `/etc` dir
-            - will require splitting on ":"
-        - Prefer user-specific configs, so take XDG_CONFIG_DIRS first.
-        - I can't know which are "more specific" in the XDG_CONFIG_DIRS var, so
-          I'll have to take it as-is.
+     1. Get conf search (from fn input)
      2. Iterate config dirs
      3. Try load toml::Value from file
      4. Try-get proj-specific table
@@ -52,26 +58,8 @@ pub fn get_config(project: &str) -> Result<PartialConfig> {
      */
 
 
-    // Read env var `XDG_CONFIG_DIRS` and split on ":" to get highest-priority list
-    // TODO: Emit warning when paths aren't unicode
-    let xdg_var = std::env::var("XDG_CONFIG_DIRS")
-        .unwrap_or(String::from(""));
-    let xdg_iter = xdg_var.split(":");
+    let file_iter = search_files;
 
-    // Set up the "/etc" list
-    //      Which is pretty silly, in this case.
-    //      Maybe a future version will scan nested folders and this will make
-    //      more sense.
-    let etc_iter = ["/etc"];
-
-    // glue on the "/etc" path
-    let path_iter = xdg_iter.chain(etc_iter);
-    let file_iter = path_iter
-        .map(|path_str| {
-            let mut path = PathBuf::from(path_str);
-            path.push("gt-tool.toml");
-            path
-        });
     let toml_iter = file_iter
         .map(std::fs::read_to_string)   // read text from file
         .filter_map(|res| res.ok()) // remove any error messages
@@ -385,7 +373,13 @@ mod tests {
     // 1. `/etc`
     // 2. anything inside `$XDG_CONFIG_DIRS`
     fn check_get_config() -> Result<()>{
-        let load_conf = get_config("/home/robert/projects/gt-tool")?;
+        let search_paths = ["./test_data/sample_config.toml"]
+            .into_iter()
+            .map(PathBuf::from);
+        let load_result = get_config(
+            "/home/robert/projects/gt-tool",
+            search_paths
+        )?;
         let expected = PartialConfig {
             project_path: Some(String::from("/home/robert/projects/gt-tool")),
             owner: Some(String::from("robert")),
@@ -394,7 +388,7 @@ mod tests {
             token: Some(String::from("fake-token")),
         };
 
-        assert_eq!(load_conf, expected);
+        assert_eq!(load_result, expected);
         Ok(())
     }
 }
