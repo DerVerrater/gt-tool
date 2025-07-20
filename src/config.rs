@@ -20,11 +20,11 @@ impl From<toml::de::Error> for Error {
     }
 }
 
-impl core::fmt::Display for Error{
-	fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-		// FIXME: Print a nice output, don't just reuse the Debug impl
-		write!(fmt, "{self:?}")
-	}
+impl core::fmt::Display for Error {
+    fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        // FIXME: Print a nice output, don't just reuse the Debug impl
+        write!(fmt, "{self:?}")
+    }
 }
 
 impl std::error::Error for Error {}
@@ -33,7 +33,7 @@ impl std::error::Error for Error {}
 /// is a list of files named "gt-tool.toml" found in decreasingly specific
 /// configuration folders.
 ///
-/// - any dirs listed in env var `$XDG_CONFIG_DIRS` 
+/// - any dirs listed in env var `$XDG_CONFIG_DIRS`
 /// - and the `/etc` dir
 ///
 /// This is so that user-specific configs are used first, then machine-wide
@@ -61,10 +61,10 @@ pub fn default_paths() -> impl Iterator<Item = PathBuf> {
 
 /// Searches through the files, `search_files`, for configuration related to a
 /// project, `project`.
-/// 
+///
 /// The project string is used as a map key and should match the real path of a
 /// project on disk. These are the table names for each config section.
-/// 
+///
 /// The search files iterator must produce *files* not *folders.* For now,
 /// there is no mechanism to ensure correct usage. Files that can't be opened
 /// will quietly be skipped, so there will be no warning when one gives a
@@ -73,28 +73,27 @@ pub fn default_paths() -> impl Iterator<Item = PathBuf> {
 /// Use `fn default_paths()` to get a reasonable (Linux) default.
 ///
 /// TODO: Check for, and warn or error when given a dir.
-pub fn get_config (
+pub fn get_config(
     project: &str,
-    search_files: impl Iterator<Item=PathBuf>
+    search_files: impl Iterator<Item = PathBuf>,
 ) -> Result<PartialConfig> {
     /*
-     1. Get conf search (from fn input)
-     2. Iterate config dirs
-     3. Try load toml::Value from file
-     4. Try-get proj-specific table
-     5. Try-get "[all]" table
-     6. (merge) Update `Option::None`s in proj-spec with `Some(_)`s from "[all]"
-     7. (merge, again) Fold the PartialConfigs into a finished one
-     */
-
+    1. Get conf search (from fn input)
+    2. Iterate config dirs
+    3. Try load toml::Value from file
+    4. Try-get proj-specific table
+    5. Try-get "[all]" table
+    6. (merge) Update `Option::None`s in proj-spec with `Some(_)`s from "[all]"
+    7. (merge, again) Fold the PartialConfigs into a finished one
+    */
 
     let file_iter = search_files;
 
     let toml_iter = file_iter
-        .map(std::fs::read_to_string)   // read text from file
+        .map(std::fs::read_to_string) // read text from file
         .filter_map(|res| res.ok()) // remove any error messages
         // TODO: Log warnings when files couldn't be read.
-        .map(|toml_text| toml_text.parse::<Value>())    // try convert to `toml::Value`
+        .map(|toml_text| toml_text.parse::<Value>()) // try convert to `toml::Value`
         .filter_map(|res| res.ok()); // remove any failed parses
     let config_iter = toml_iter
         .map(|val| -> Result<PartialConfig> {
@@ -117,15 +116,11 @@ pub fn get_config (
                     ))
                 })
                 // 5. Merge the PartialConfigs together, project-specific has higher priority
-                .and_then(|pair| {
-                    Ok(pair.0.merge(pair.1))
-                });
+                .and_then(|pair| Ok(pair.0.merge(pair.1)));
             maybe_proj
         })
         .filter_map(|res| res.ok())
-        .fold(PartialConfig::default(), |acc, inc|{
-            acc.merge(inc)
-        });
+        .fold(PartialConfig::default(), |acc, inc| acc.merge(inc));
     return Ok(config_iter);
 }
 
@@ -143,7 +138,7 @@ impl PartialConfig {
     // One lonely builder-pattern function to set the project path.
     // This is so I can do continuation style calls instead of a bunch of
     // successive `let conf = ...` temporaries.
-    fn project_path(self, path: impl ToString) -> Self{
+    fn project_path(self, path: impl ToString) -> Self {
         PartialConfig {
             project_path: Some(path.to_string()),
             ..self
@@ -177,7 +172,6 @@ impl TryFrom<&Table> for PartialConfig {
             token: get_maybe_property(&value, "token")?.cloned(),
         })
     }
-
 }
 
 /// The outer value must be a Table so we can get the sub-table from it.
@@ -189,10 +183,12 @@ fn get_table<'outer>(outer: &'outer Table, table_name: impl ToString) -> Result<
         .ok_or(Error::BadFormat)?)
 }
 
-
 /// Similar to `get_property()` but maps the "Error::NoSuchProperty" result to
 /// Option::None. Some properties aren't specified, and that's okay... sometimes.
-fn get_maybe_property<'outer> (outer: &'outer Table, property: impl ToString) -> Result<Option<&'outer String>> {
+fn get_maybe_property<'outer>(
+    outer: &'outer Table,
+    property: impl ToString,
+) -> Result<Option<&'outer String>> {
     let maybe_prop = get_property(outer, property);
     match maybe_prop {
         Ok(value) => Ok(Some(value)),
@@ -209,7 +205,9 @@ fn get_maybe_property<'outer> (outer: &'outer Table, property: impl ToString) ->
 /// The config properties are individual strings. This gets the named property,
 /// or an error explaining why it couldn't be fetched.
 fn get_property<'outer>(outer: &'outer Table, property: impl ToString) -> Result<&'outer String> {
-    let maybe_prop = outer.get(&property.to_string()).ok_or(Error::NoSuchProperty)?;
+    let maybe_prop = outer
+        .get(&property.to_string())
+        .ok_or(Error::NoSuchProperty)?;
     if let Value::String(text) = maybe_prop {
         Ok(text)
     } else {
@@ -254,7 +252,10 @@ mod tests {
         let fx_value = fx_input_str.parse::<Value>()?;
         let fx_value = fx_value.as_table().ok_or(Error::BadFormat)?;
         let mut expected: Map<String, Value> = Map::new();
-        expected.insert(String::from("with_a_garbage"), Value::String(String::from("value")));
+        expected.insert(
+            String::from("with_a_garbage"),
+            Value::String(String::from("value")),
+        );
 
         let res = get_table(&fx_value, String::from("tab"))?;
         assert_eq!(res, &expected);
@@ -267,14 +268,11 @@ mod tests {
     // Right now, that means a file called "gt-tool.toml" in
     // 1. `/etc`
     // 2. anything inside `$XDG_CONFIG_DIRS`
-    fn check_get_config() -> Result<()>{
+    fn check_get_config() -> Result<()> {
         let search_paths = ["./test_data/sample_config.toml"]
             .into_iter()
             .map(PathBuf::from);
-        let load_result = get_config(
-            "/home/robert/projects/gt-tool",
-            search_paths
-        )?;
+        let load_result = get_config("/home/robert/projects/gt-tool", search_paths)?;
         let expected = PartialConfig {
             project_path: Some(String::from("/home/robert/projects/gt-tool")),
             owner: Some(String::from("robert")),
