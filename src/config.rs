@@ -310,4 +310,30 @@ mod tests {
         assert_eq!(load_result, expected);
         Ok(())
     }
+
+    // Ensure that trying to load files that don't exist simply get skipped over
+    // instead of causing a short-circuit exit or other bogus output.
+    #[test]
+    fn test_get_config_many_missing_files() -> Result<()> {
+        let search_paths = [
+            "./test_data/not_real_1.toml",
+            "./test_data/not_real_2.toml",
+            "./test_data/not_real_3.toml",
+            "./test_data/not_real_4.toml",
+            "./test_data/not_real_5.toml",
+            "./test_data/sample_config.toml",
+            "./test_data/not_real_6.toml",
+        ].into_iter().map(PathBuf::from);
+        let load_result = get_config("/home/robert/projects/gt-tool", search_paths)?;
+        let expected = PartialConfig {
+            project_path: Some(String::from("/home/robert/projects/gt-tool")),
+            owner: Some(String::from("robert")),
+            repo: Some(String::from("gt-tool")),
+            gitea_url: Some(String::from("http://localhost:3000")),
+            token: Some(String::from("fake-token")),
+        };
+
+        assert_eq!(load_result, expected);
+        Ok(())
+    }
 }
