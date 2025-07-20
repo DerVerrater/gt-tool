@@ -127,10 +127,10 @@ pub fn get_config(
 #[cfg_attr(test, derive(PartialEq))]
 pub struct PartialConfig {
     project_path: Option<String>,
-    gitea_url: Option<String>,
-    owner: Option<String>,
-    repo: Option<String>,
-    token: Option<String>,
+    pub gitea_url: Option<String>,
+    pub owner: Option<String>,
+    pub repo: Option<String>,
+    pub token: Option<String>,
 }
 
 impl PartialConfig {
@@ -259,11 +259,6 @@ mod tests {
     }
 
     #[test]
-    // FIXME: Allow user-specified search paths, then update test to use them.
-    // This test can only work if there's a config file the program can find.
-    // Right now, that means a file called "gt-tool.toml" in
-    // 1. `/etc`
-    // 2. anything inside `$XDG_CONFIG_DIRS`
     fn check_get_config() -> Result<()> {
         let search_paths = ["./test_data/sample_config.toml"]
             .into_iter()
