@@ -105,8 +105,10 @@ pub fn get_config(
             // 2. Get table
 
             get_table(cfg_table, project)
-                // 3. convert to PartialConfig
+                // 3a. convert to PartialConfig
                 .and_then(PartialConfig::try_from)
+                // 3b. or default, if the table couldn't be found.
+                .or(Ok(PartialConfig::default()))
                 // 4. assemble a 2-tuple of PartialConfigs by...
                 .and_then(|proj| {
                     Ok((
