@@ -103,7 +103,8 @@ pub fn get_config(
             let cfg_table = val.as_table().ok_or(Error::BadFormat)?;
 
             // 2. Get table
-            let maybe_proj = get_table(cfg_table, project)
+
+            get_table(cfg_table, project)
                 // 3. convert to PartialConfig
                 .and_then(PartialConfig::try_from)
                 // 4. assemble a 2-tuple of PartialConfigs by...
@@ -115,13 +116,11 @@ pub fn get_config(
                         get_table(cfg_table, "all").and_then(PartialConfig::try_from)?,
                     ))
                 })
-                // 5. Merge the PartialConfigs together, project-specific has higher priority
-                .and_then(|pair| Ok(pair.0.merge(pair.1)));
-            maybe_proj
+                .map(|pair| pair.0.merge(pair.1))
         })
         .filter_map(|res| res.ok())
         .fold(PartialConfig::default(), |acc, inc| acc.merge(inc));
-    return Ok(config_iter);
+    Ok(config_iter)
 }
 
 #[derive(Debug, Default)]
@@ -166,37 +165,34 @@ impl TryFrom<&Table> for PartialConfig {
         Ok(Self {
             // can't get table name because that key is gone by this point.
             project_path: None,
-            gitea_url: get_maybe_property(&value, "gitea_url")?.cloned(),
-            owner: get_maybe_property(&value, "owner")?.cloned(),
-            repo: get_maybe_property(&value, "repo")?.cloned(),
-            token: get_maybe_property(&value, "token")?.cloned(),
+            gitea_url: get_maybe_property(value, "gitea_url")?.cloned(),
+            owner: get_maybe_property(value, "owner")?.cloned(),
+            repo: get_maybe_property(value, "repo")?.cloned(),
+            token: get_maybe_property(value, "token")?.cloned(),
         })
     }
 }
 
 /// The outer value must be a Table so we can get the sub-table from it.
-fn get_table<'outer>(outer: &'outer Table, table_name: impl ToString) -> Result<&'outer Table> {
-    Ok(outer
+fn get_table(outer: &Table, table_name: impl ToString) -> Result<&Table> {
+    outer
         .get(&table_name.to_string())
         .ok_or(Error::NoSuchTable)?
         .as_table()
-        .ok_or(Error::BadFormat)?)
+        .ok_or(Error::BadFormat)
 }
 
 /// Similar to `get_property()` but maps the "Error::NoSuchProperty" result to
 /// Option::None. Some properties aren't specified, and that's okay... sometimes.
-fn get_maybe_property<'outer>(
-    outer: &'outer Table,
-    property: impl ToString,
-) -> Result<Option<&'outer String>> {
+fn get_maybe_property(outer: &Table, property: impl ToString) -> Result<Option<&String>> {
     let maybe_prop = get_property(outer, property);
     match maybe_prop {
         Ok(value) => Ok(Some(value)),
         Err(e) => {
             if let Error::NoSuchProperty = e {
-                return Ok(None);
+                Ok(None)
             } else {
-                return Err(e);
+                Err(e)
             }
         }
     }
@@ -204,7 +200,7 @@ fn get_maybe_property<'outer>(
 
 /// The config properties are individual strings. This gets the named property,
 /// or an error explaining why it couldn't be fetched.
-fn get_property<'outer>(outer: &'outer Table, property: impl ToString) -> Result<&'outer String> {
+fn get_property(outer: &Table, property: impl ToString) -> Result<&String> {
     let maybe_prop = outer
         .get(&property.to_string())
         .ok_or(Error::NoSuchProperty)?;
