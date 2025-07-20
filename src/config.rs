@@ -29,6 +29,36 @@ impl core::fmt::Display for Error{
 
 impl std::error::Error for Error {}
 
+/// Creates an iterator of default (Linux) search paths. The iterator output
+/// is a list of files named "gt-tool.toml" found in decreasingly specific
+/// configuration folders.
+///
+/// - any dirs listed in env var `$XDG_CONFIG_DIRS` 
+/// - and the `/etc` dir
+///
+/// This is so that user-specific configs are used first, then machine-wide
+/// ones.
+pub fn default_paths() -> impl Iterator<Item = PathBuf> {
+    // Read env var `XDG_CONFIG_DIRS` and split on ":" to get highest-priority list
+    // TODO: Emit warning when paths aren't unicode
+    std::env::var("XDG_CONFIG_DIRS")
+        .unwrap_or(String::from(""))
+        .split(":")
+        // Set up the "/etc" list
+        //      Which is pretty silly, in this case.
+        //      Maybe a future version will scan nested folders and this will make
+        //      more sense.
+        // glue on the "/etc" path
+        .chain(["/etc"])
+        .map(|path_str| {
+            let mut path = PathBuf::from(path_str);
+            path.push("gt-tool.toml");
+            path
+        })
+        .collect::<Vec<_>>()
+        .into_iter()
+}
+
 /// Searches through the files, `search_files`, for configuration related to a
 /// project, `project`.
 /// 
