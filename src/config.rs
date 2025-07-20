@@ -115,7 +115,9 @@ pub fn get_config(
                         // 4-1. Passing in the project-specific PartialConfig
                         proj.project_path(project),
                         // 4-2. Getting and converting to PartialConfig, or returning any Err() if one appears.
-                        get_table(cfg_table, "all").and_then(PartialConfig::try_from)?,
+                        get_table(cfg_table, "all")
+                            .and_then(PartialConfig::try_from)
+                            .unwrap_or(PartialConfig::default()),
                     ))
                 })
                 .map(|pair| pair.0.merge(pair.1))
