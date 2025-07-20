@@ -285,7 +285,7 @@ mod tests {
             .map(PathBuf::from);
         let load_result = get_config("/no/such/project", search_paths)?;
         let expected = PartialConfig {
-            project_path: None,
+            project_path: Some(String::from("/no/such/project")),
             owner: None,
             repo: None,
             gitea_url: Some(String::from("http://localhost:3000")),
@@ -304,6 +304,7 @@ mod tests {
             .map(PathBuf::from);
         let load_result = get_config("/some/other/path", search_paths)?;
         let expected = PartialConfig {
+            project_path: Some(String::from("/some/other/path")),
             gitea_url: Some(String::from("fake-url")),  
             ..PartialConfig::default() 
         };
