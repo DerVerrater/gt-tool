@@ -12,6 +12,34 @@ use reqwest::header::ACCEPT;
 async fn main() -> Result<(), gt_tool::Error> {
     let args = Args::parse();
 
+    // TODO: Heuristics to guess project path
+    // See issue #8: https://git.gelvin.dev/robert/gt-tool/issues/8
+    let pwd = std::env::current_dir()
+        .map_err(|_e| gt_tool::Error::WrappedConfigErr(
+            gt_tool::config::Error::CouldntReadFile
+        ))?;
+    let config = gt_tool::config::get_config(
+        pwd.to_str().expect("I assumed the path can be UTF-8, but that didn't work out..."),
+        gt_tool::config::default_paths()
+    )?;
+    println!("->> Loaded Config: {config:?}");
+    // arg parser also checks the environment. Prefer CLI/env, then config file.
+    let gitea_url = args.gitea_url.or(config.gitea_url).ok_or(gt_tool::Error::MissingGiteaUrl)?;
+    // Config files split the repo FQRN into "owner" and "repo" (confusing naming, sorry)
+    // These must be merged back together and passed along.
+    let conf_fqrn = config.owner
+        .ok_or(gt_tool::Error::MissingRepoFRQN)
+        .and_then(| mut own| {
+            let repo = config.repo.ok_or(gt_tool::Error::MissingRepoFRQN)?;
+            own.push_str("/");
+            own.push_str(&repo);
+            Ok(own)
+        });
+    let repo_fqrn  = args.repo
+        .ok_or(gt_tool::Error::MissingRepoFRQN)
+        .or(conf_fqrn)?;
+
+
     let mut headers = reqwest::header::HeaderMap::new();
     headers.append(ACCEPT, header::HeaderValue::from_static("application/json"));
 
@@ -28,7 +56,7 @@ async fn main() -> Result<(), gt_tool::Error> {
     match args.command {
         gt_tool::cli::Commands::ListReleases => {
             let releases =
-                gt_tool::api::release::list_releases(&client, &args.gitea_url, &args.repo).await?;
+                gt_tool::api::release::list_releases(&client, &gitea_url, &repo_fqrn).await?;
             // Print in reverse order so the newest items are closest to the
             // user's command prompt. Otherwise the newest item scrolls off the
             // screen and can't be seen.
@@ -54,7 +82,7 @@ async fn main() -> Result<(), gt_tool::Error> {
                 tag_name,
                 target_commitish,
             };
-            gt_tool::api::release::create_release(&client, &args.gitea_url, &args.repo, submission)
+            gt_tool::api::release::create_release(&client, &gitea_url, &repo_fqrn, submission)
                 .await?;
         }
         gt_tool::cli::Commands::UploadRelease {
@@ -75,7 +103,7 @@ async fn main() -> Result<(), gt_tool::Error> {
             // Grab all, find the one that matches the input tag.
             // Scream if there are multiple matches.
             let release_candidates =
-                gt_tool::api::release::list_releases(&client, &args.gitea_url, &args.repo).await?;
+                gt_tool::api::release::list_releases(&client, &gitea_url, &repo_fqrn).await?;
 
             if let Some(release) = match_release_by_tag(&tag_name, release_candidates) {
                 for file in &files {
@@ -94,8 +122,8 @@ async fn main() -> Result<(), gt_tool::Error> {
                 for file in files {
                     let _attach_desc = gt_tool::api::release_attachment::create_release_attachment(
                         &client,
-                        &args.gitea_url,
-                        &args.repo,
+                        &gitea_url,
+                        &repo_fqrn,
                         release.id,
                         file,
                     )

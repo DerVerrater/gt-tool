@@ -21,6 +21,9 @@ pub(crate) async fn decode_client_error(response: reqwest::Response) -> Result<A
 #[derive(Debug)]
 pub enum Error {
     Placeholder, // TODO: Enumerate error modes
+    MissingGiteaUrl, // the gitea URL wasn't specified on the CLI, env, or config file.
+    MissingRepoFRQN, // either the owner, repo, or both weren't specified in the loaded PartialConfig
+    WrappedConfigErr(config::Error),
     WrappedReqwestErr(reqwest::Error),
     MissingAuthToken,
     NoSuchFile, // for release attachment 'file exists' pre-check.
@@ -31,6 +34,12 @@ pub enum Error {
 impl From<reqwest::Error> for crate::Error {
     fn from(value: reqwest::Error) -> Self {
         Self::WrappedReqwestErr(value)
+    }
+}
+
+impl From<crate::config::Error> for crate::Error {
+    fn from(value: crate::config::Error) -> Self {
+        Self::WrappedConfigErr(value)
     }
 }
 
