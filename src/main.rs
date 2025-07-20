@@ -15,30 +15,33 @@ async fn main() -> Result<(), gt_tool::Error> {
     // TODO: Heuristics to guess project path
     // See issue #8: https://git.gelvin.dev/robert/gt-tool/issues/8
     let pwd = std::env::current_dir()
-        .map_err(|_e| gt_tool::Error::WrappedConfigErr(
-            gt_tool::config::Error::CouldntReadFile
-        ))?;
+        .map_err(|_e| gt_tool::Error::WrappedConfigErr(gt_tool::config::Error::CouldntReadFile))?;
     let config = gt_tool::config::get_config(
-        pwd.to_str().expect("I assumed the path can be UTF-8, but that didn't work out..."),
-        gt_tool::config::default_paths()
+        pwd.to_str()
+            .expect("I assumed the path can be UTF-8, but that didn't work out..."),
+        gt_tool::config::default_paths(),
     )?;
     println!("->> Loaded Config: {config:?}");
     // arg parser also checks the environment. Prefer CLI/env, then config file.
-    let gitea_url = args.gitea_url.or(config.gitea_url).ok_or(gt_tool::Error::MissingGiteaUrl)?;
+    let gitea_url = args
+        .gitea_url
+        .or(config.gitea_url)
+        .ok_or(gt_tool::Error::MissingGiteaUrl)?;
     // Config files split the repo FQRN into "owner" and "repo" (confusing naming, sorry)
     // These must be merged back together and passed along.
-    let conf_fqrn = config.owner
+    let conf_fqrn = config
+        .owner
         .ok_or(gt_tool::Error::MissingRepoFRQN)
-        .and_then(| mut own| {
+        .and_then(|mut own| {
             let repo = config.repo.ok_or(gt_tool::Error::MissingRepoFRQN)?;
             own.push_str("/");
             own.push_str(&repo);
             Ok(own)
         });
-    let repo_fqrn  = args.repo
+    let repo_fqrn = args
+        .repo
         .ok_or(gt_tool::Error::MissingRepoFRQN)
         .or(conf_fqrn)?;
-
 
     let mut headers = reqwest::header::HeaderMap::new();
     headers.append(ACCEPT, header::HeaderValue::from_static("application/json"));
@@ -121,11 +124,7 @@ async fn main() -> Result<(), gt_tool::Error> {
                 }
                 for file in files {
                     let _attach_desc = gt_tool::api::release_attachment::create_release_attachment(
-                        &client,
-                        &gitea_url,
-                        &repo_fqrn,
-                        release.id,
-                        file,
+                        &client, &gitea_url, &repo_fqrn, release.id, file,
                     )
                     .await?;
                 }

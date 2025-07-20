@@ -166,10 +166,10 @@ impl TryFrom<&Table> for PartialConfig {
     type Error = crate::config::Error;
 
     /// Scans properties out of a `toml::Table` to get a PartialConfig.
-    /// 
+    ///
     /// `Error::NoSuchProperty` is quietly ignored (mapped to `None`) since it
     /// isn't an error in this context.
-    /// 
+    ///
     /// All other errors are propagated and should be treated as real failures.
     fn try_from(value: &Table) -> Result<Self> {
         Ok(Self {
@@ -315,8 +315,8 @@ mod tests {
         let load_result = get_config("/some/other/path", search_paths)?;
         let expected = PartialConfig {
             project_path: Some(String::from("/some/other/path")),
-            gitea_url: Some(String::from("fake-url")),  
-            ..PartialConfig::default() 
+            gitea_url: Some(String::from("fake-url")),
+            ..PartialConfig::default()
         };
         assert_eq!(load_result, expected);
         Ok(())
@@ -334,7 +334,9 @@ mod tests {
             "./test_data/not_real_5.toml",
             "./test_data/sample_config.toml",
             "./test_data/not_real_6.toml",
-        ].into_iter().map(PathBuf::from);
+        ]
+        .into_iter()
+        .map(PathBuf::from);
         let load_result = get_config("/home/robert/projects/gt-tool", search_paths)?;
         let expected = PartialConfig {
             project_path: Some(String::from("/home/robert/projects/gt-tool")),
