@@ -4,9 +4,9 @@ use clap::{Parser, Subcommand};
 #[command(version, about, long_about = None)]
 pub struct Args {
     #[arg(short = 'u', long = "url", env = "GTTOOL_GITEA_URL")]
-    pub gitea_url: String,
+    pub gitea_url: Option<String>,
     #[arg(short = 'r', long = "repo", env = "GTTOOL_FQRN")]
-    pub repo: String,
+    pub repo: Option<String>,
 
     #[command(subcommand)]
     pub command: Commands,
