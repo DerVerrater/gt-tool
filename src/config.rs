@@ -180,54 +180,6 @@ impl TryFrom<&Table> for PartialConfig {
 
 }
 
-#[derive(Debug, Default)]
-#[cfg_attr(test, derive(PartialEq))]
-struct WholeFile {
-    all: PartialConfig,
-    project_overrides: Vec<PartialConfig>,
-}
-
-fn load_from_file(path: &str) -> Result<WholeFile> {
-    let res = std::fs::read_to_string(path);
-    match res {
-        Ok(s) => read_conf_str(s.as_str()),
-        Err(e) => {
-            eprintln!("->> file io err: {:?}", e);
-            Err(Error::CouldntReadFile)
-        }
-    }
-}
-
-fn read_conf_str(text: &str) -> Result<WholeFile> {
-    let mut whole = WholeFile::default();
-
-    let toml_val = text.parse::<Value>()?;
-
-    // The config file is one big table. If the string we decoded is
-    // some other toml::Value variant, it's not correct.
-    // Try getting it as a table, return Err(BadFormat) otherwise.
-    let cfg_table = toml_val.as_table().ok_or(Error::BadFormat)?;
-
-    // Get the global config out of the file
-    let table_all = get_table(cfg_table, "all")?;
-    whole.all = PartialConfig::try_from(table_all)?;
-
-    // Loop over the per-project configs, if any.
-    let per_project_keys = cfg_table
-        .keys()
-        .filter(|s| { // Discard the "[all]" table
-            *s != "all"
-        });
-
-    for path in per_project_keys {
-        let tab = get_table(cfg_table, path)?;
-        let part_cfg = PartialConfig::try_from(tab)?
-            .project_path(path.clone());
-        whole.project_overrides.push(part_cfg);
-    }
-    Ok(whole)
-}
-
 /// The outer value must be a Table so we can get the sub-table from it.
 fn get_table<'outer>(outer: &'outer Table, table_name: impl ToString) -> Result<&'outer Table> {
     Ok(outer
@@ -271,43 +223,6 @@ mod tests {
 
     use super::*;
 
-    // Util for generating a reference struct
-    fn gen_expected_struct() -> WholeFile {
-        WholeFile {
-            all: PartialConfig {
-                project_path: None,
-                gitea_url: Some(String::from("http://localhost:3000")),
-                owner: None,
-                repo: None,
-                token: Some(String::from("fake-token"))
-            },
-            project_overrides: vec![
-                PartialConfig {
-                    project_path: Some(String::from("/home/robert/projects/gt-tool")),
-                    gitea_url: None,
-                    owner: Some(String::from("robert")),
-                    repo: Some(String::from("gt-tool")),
-                    token: None,
-                },
-                PartialConfig {
-                    project_path: Some(String::from("/home/robert/projects/rcalc")),
-                    gitea_url: None,
-                    owner: Some(String::from("jamis")),
-                    repo: Some(String::from("rcalc")),
-                    token: None,
-                },
-                PartialConfig {
-                    project_path: Some(String::from("/home/robert/projects/rcalc-builders")),
-                    gitea_url: None,
-                    owner: Some(String::from("jamis")),
-                    repo: Some(String::from("rcalc")),
-                    token: None,
-                },
-            
-            ],
-        }
-    }
-
     #[test]
     fn read_single_prop() -> Result<()> {
         let fx_input_str = "owner = \"dingus\"";
@@ -344,56 +259,6 @@ mod tests {
         let res = get_table(&fx_value, String::from("tab"))?;
         assert_eq!(res, &expected);
         Ok(())
-    }
-
-    #[test]
-    fn read_config_string_ok() -> Result<()> {
-        let fx_sample_config_string = include_str!("../test_data/sample_config.toml");
-        let fx_expected_struct = gen_expected_struct();
-        let conf = read_conf_str(fx_sample_config_string)?;
-        
-        assert_eq!(conf, fx_expected_struct);
-        Ok(())
-    }
-
-    /* TODO: Improve semantics around reading an empty string
-    An empty config string will result in Error::NoSuchTable when "[all]"
-    is retrieved. But this will *also* happen when other configs are present,
-    but "[all]" isn't. Do I treat these as valid configurations, using some
-    hard-coded default as the fallback? Or do I reject configs that don't have
-    an all-table?
-     */
-    #[test]
-    fn read_config_string_empty() {
-        let fx_sample_cfg = "";
-        let conf = read_conf_str(fx_sample_cfg);
-        assert!(conf.is_err());
-    }
-
-    #[test]
-    // File exists and has valid configuration.
-    fn load_from_file_ok() -> Result<()> {
-        let conf = load_from_file("test_data/sample_config.toml")?;
-        assert_eq!(conf, gen_expected_struct());
-        Ok(())
-    }
-
-    #[test]
-    // File does not exist.
-    fn load_from_file_missing() -> Result<()> {
-        let res = load_from_file("test_data/doesnt_exist.toml");
-        let err = res.unwrap_err();
-        assert_eq!(err, Error::CouldntReadFile);
-        Ok(())
-    }
-
-    #[test]
-    // File exists but has garbage inside.
-    // TODO: This bumps against the same semantic issue as the todo note on
-    // the 'read_config_string_empty' test
-    fn load_from_file_bad() {
-        let res = load_from_file("test_data/missing_all_table.toml");
-        assert!(res.is_err());
     }
 
     #[test]
