@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use toml::{Value, value::Table};
 
 pub type Result<T> = core::result::Result<T, Error>;
@@ -27,9 +29,91 @@ impl core::fmt::Display for Error{
 
 impl std::error::Error for Error {}
 
+/// Retrieves the configuration values for the project located at a given path.
+/// 
+/// Configs are read from files named "gt-tool.toml" in 
+/// - /etc
+/// - each dir in $XDG_CONFIG_DIRS.
+/// FIXME: Allow user-specified search paths.
+pub fn get_config(project: &str) -> Result<PartialConfig> {
+    /*
+     1. Find all search dirs
+        - anything in `$XDG_CONFIG_DIRS` and the `/etc` dir
+            - will require splitting on ":"
+        - Prefer user-specific configs, so take XDG_CONFIG_DIRS first.
+        - I can't know which are "more specific" in the XDG_CONFIG_DIRS var, so
+          I'll have to take it as-is.
+     2. Iterate config dirs
+     3. Try load toml::Value from file
+     4. Try-get proj-specific table
+     5. Try-get "[all]" table
+     6. (merge) Update `Option::None`s in proj-spec with `Some(_)`s from "[all]"
+     7. (merge, again) Fold the PartialConfigs into a finished one
+     */
+
+
+    // Read env var `XDG_CONFIG_DIRS` and split on ":" to get highest-priority list
+    // TODO: Emit warning when paths aren't unicode
+    let xdg_var = std::env::var("XDG_CONFIG_DIRS")
+        .unwrap_or(String::from(""));
+    let xdg_iter = xdg_var.split(":");
+
+    // Set up the "/etc" list
+    //      Which is pretty silly, in this case.
+    //      Maybe a future version will scan nested folders and this will make
+    //      more sense.
+    let etc_iter = ["/etc"];
+
+    // glue on the "/etc" path
+    let path_iter = xdg_iter.chain(etc_iter);
+    let file_iter = path_iter
+        .map(|path_str| {
+            let mut path = PathBuf::from(path_str);
+            path.push("gt-tool.toml");
+            path
+        });
+    let toml_iter = file_iter
+        .map(std::fs::read_to_string)   // read text from file
+        .filter_map(|res| res.ok()) // remove any error messages
+        // TODO: Log warnings when files couldn't be read.
+        .map(|toml_text| toml_text.parse::<Value>())    // try convert to `toml::Value`
+        .filter_map(|res| res.ok()); // remove any failed parses
+    let config_iter = toml_iter
+        .map(|val| -> Result<PartialConfig> {
+            // Like `fn read_conf_str(...)`, but doesn't produce a `WholeFile`
+
+            // 1. Get the top-level table that is the config file
+            let cfg_table = val.as_table().ok_or(Error::BadFormat)?;
+
+            // 2. Get table
+            let maybe_proj = get_table(cfg_table, project)
+                // 3. convert to PartialConfig
+                .and_then(PartialConfig::try_from)
+                // 4. assemble a 2-tuple of PartialConfigs by...
+                .and_then(|proj| {
+                    Ok((
+                        // 4-1. Passing in the project-specific PartialConfig
+                        proj.project_path(project),
+                        // 4-2. Getting and converting to PartialConfig, or returning any Err() if one appears.
+                        get_table(cfg_table, "all").and_then(PartialConfig::try_from)?,
+                    ))
+                })
+                // 5. Merge the PartialConfigs together, project-specific has higher priority
+                .and_then(|pair| {
+                    Ok(pair.0.merge(pair.1))
+                });
+            maybe_proj
+        })
+        .filter_map(|res| res.ok())
+        .fold(PartialConfig::default(), |acc, inc|{
+            acc.merge(inc)
+        });
+    return Ok(config_iter);
+}
+
 #[derive(Debug, Default)]
 #[cfg_attr(test, derive(PartialEq))]
-struct PartialConfig {
+pub struct PartialConfig {
     project_path: Option<String>,
     gitea_url: Option<String>,
     owner: Option<String>,
@@ -292,5 +376,25 @@ mod tests {
     fn load_from_file_bad() {
         let res = load_from_file("test_data/missing_all_table.toml");
         assert!(res.is_err());
+    }
+
+    #[test]
+    // FIXME: Allow user-specified search paths, then update test to use them.
+    // This test can only work if there's a config file the program can find.
+    // Right now, that means a file called "gt-tool.toml" in
+    // 1. `/etc`
+    // 2. anything inside `$XDG_CONFIG_DIRS`
+    fn check_get_config() -> Result<()>{
+        let load_conf = get_config("/home/robert/projects/gt-tool")?;
+        let expected = PartialConfig {
+            project_path: Some(String::from("/home/robert/projects/gt-tool")),
+            owner: Some(String::from("robert")),
+            repo: Some(String::from("gt-tool")),
+            gitea_url: Some(String::from("http://localhost:3000")),
+            token: Some(String::from("fake-token")),
+        };
+
+        assert_eq!(load_conf, expected);
+        Ok(())
     }
 }
