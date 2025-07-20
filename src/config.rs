@@ -161,6 +161,12 @@ impl PartialConfig {
 impl TryFrom<&Table> for PartialConfig {
     type Error = crate::config::Error;
 
+    /// Scans properties out of a `toml::Table` to get a PartialConfig.
+    /// 
+    /// `Error::NoSuchProperty` is quietly ignored (mapped to `None`) since it
+    /// isn't an error in this context.
+    /// 
+    /// All other errors are propagated and should be treated as real failures.
     fn try_from(value: &Table) -> Result<Self> {
         Ok(Self {
             // can't get table name because that key is gone by this point.
