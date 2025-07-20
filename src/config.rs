@@ -47,6 +47,19 @@ impl PartialConfig {
             ..self
         }
     }
+
+    // Merges two `PartialConfig`'s together, producing a new one.
+    // Non-None values on the right-hand side are used to replace values
+    // in the left-hand side, even if they are Some(_).
+    fn merge(self, other: Self) -> Self {
+        Self {
+            project_path: other.project_path.or(self.project_path),
+            gitea_url: other.gitea_url.or(self.gitea_url),
+            owner: other.owner.or(self.owner),
+            repo: other.repo.or(self.repo),
+            token: other.token.or(self.token),
+        }
+    }
 }
 
 impl TryFrom<&Table> for PartialConfig {
