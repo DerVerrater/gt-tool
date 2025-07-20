@@ -259,7 +259,7 @@ mod tests {
     }
 
     #[test]
-    fn check_get_config() -> Result<()> {
+    fn test_get_config_with_specific_match() -> Result<()> {
         let search_paths = ["./test_data/sample_config.toml"]
             .into_iter()
             .map(PathBuf::from);
@@ -272,6 +272,41 @@ mod tests {
             token: Some(String::from("fake-token")),
         };
 
+        assert_eq!(load_result, expected);
+        Ok(())
+    }
+
+    // Ensure the config comes back with something even when there is no
+    // matching project-specific table.
+    #[test]
+    fn test_get_config_no_specific_match() -> Result<()> {
+        let search_paths = ["./test_data/sample_config.toml"]
+            .into_iter()
+            .map(PathBuf::from);
+        let load_result = get_config("/no/such/project", search_paths)?;
+        let expected = PartialConfig {
+            project_path: None,
+            owner: None,
+            repo: None,
+            gitea_url: Some(String::from("http://localhost:3000")),
+            token: Some(String::from("fake-token")),
+        };
+        assert_eq!(load_result, expected);
+        Ok(())
+    }
+
+    // Ensure the config comes back with something even when there is no
+    // "[all]" table
+    #[test]
+    fn test_get_config_without_all() -> Result<()> {
+        let search_paths = ["./test_data/missing_all_table.toml"]
+            .into_iter()
+            .map(PathBuf::from);
+        let load_result = get_config("/some/other/path", search_paths)?;
+        let expected = PartialConfig {
+            gitea_url: Some(String::from("fake-url")),  
+            ..PartialConfig::default() 
+        };
         assert_eq!(load_result, expected);
         Ok(())
     }
