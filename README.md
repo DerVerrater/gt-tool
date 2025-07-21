@@ -42,11 +42,16 @@ Likewise, the "repo" is what ever the Gitea instance thinks it's called -- which
 
 ### Authentication
 
-Authentication is token-based via environment variable `RELEASE_KEY_GITEA`.
+Authentication is token-based. There is no CLI option to prevent the token from appearing in any command logs.
 
-Ensure your token has the appropriate access for your usage. This depends on what you're doing and how your Gitea instance is configured, so you'll have to figure it out for yourself.
+In order of priority, the token is loaded from:
 
-Most likely, you will need a token with "repository: read-and-write" permissions. See Gitea's documentation on [token scopes](https://docs.gitea.com/development/oauth2-provider#scopes) for more.
+1. The environment variable `RELEASE_KEY_GITEA`
+2. Config files, key `token`
+
+Whether or not it is required depends on how your Gitea instance and the repositories inside are configured.  For example, a default Gitea configuration will allow unauthenticated users to see public repositories but not make any changes. This means no token is required to run `gt-tool list-releases`, while `gt-tool upload-release` *will* require a token.
+
+For details, see Gitea's documentation on [token scopes](https://docs.gitea.com/development/oauth2-provider#scopes).
 
 ### `<GITEA_URL>`:
 
