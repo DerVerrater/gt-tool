@@ -74,6 +74,8 @@ Instead of specifying everything on the command line every single run, some TOML
 
 > Exporting some environment variables would be similar, but that would be *more* annoying when working on multiple projects. One would have to constantly re-export the settings or use two shells. But then there's the issue of losing track of which shell has which settings.
 
+### File Format
+
 Settings are retrieved from a table named the same as the project's path on disk. For example, gt_tool itself could have an entry as follows:
 
 ```toml
@@ -105,7 +107,12 @@ gitea_url = "http://localhost:3000"
 repo = "gt-tool"
 ```
 
-Similar to how unspecified project settings will fall back to those in the "`[all]`" table, whole files will fall back to other, lower priority files. First, each dir in `$XDG_CONFIG_DIRS` is scanned for a `gt-tool.toml` file. Then, `/etc/gt-tool.toml`.
+### Search Paths
+
+Similar to how unspecified project settings will fall back to those in the "`[all]`" table, whole files will fall back to other, lower priority files.
+
+1. First, each dir in `$XDG_CONFIG_DIRS` is scanned for a `gt-tool.toml` file.
+2. Then, `/etc/gt-tool.toml`.
 
 > All config files **MUST** be named named `gt-tool.toml`.
 
