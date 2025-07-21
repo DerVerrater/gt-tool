@@ -12,7 +12,7 @@ pub struct Args {
     #[arg(
         short = 'p',
         long = "project",
-        help = "Path to project (relative or absolute). Used to select configuration."
+        help = "Path to project (relative or absolute). Used to override configuration selection."
     )]
     pub project: Option<String>,
 
