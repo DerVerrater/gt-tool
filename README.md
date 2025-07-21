@@ -53,18 +53,6 @@ Whether or not it is required depends on how your Gitea instance and the reposit
 
 For details, see Gitea's documentation on [token scopes](https://docs.gitea.com/development/oauth2-provider#scopes).
 
-### `<GITEA_URL>`:
-
-The Gitea server URL must be provided with `--url` or `-u` on the command line, or via the environment variable `GTTOOL_GITEA_URL`. Use the base URL for your Gitea instance.
-
-E.g.: Using the Gitea org's demo instance, it would be: `--url "https://demo.gitea.com/"`
-
-### `<REPO>`:
-
-The repository name must be provided with `--repo` or `-u` on the command line, or via the environment variable `GTTOOL_GITEA_FQRN` ("fully qualified repo name"). Use the format `<owner>/<repo>`, which is the route immediately following the GITEA_URL base. This is how GitHub and Gitea identify repos in the URL, and how Golang locates it's modules, so this tool does the same.
-
-E.g.: `--repo "go-gitea/gitea"` would name the Gitea repo belonging to the go-gitea organization.
-
 ### `<PROJECT>`
 
 Override the default (current-directory) project name when searching through the config files for this project's settings.
