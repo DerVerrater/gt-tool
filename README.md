@@ -74,8 +74,6 @@ repo = "gt-tool"
 token = "fake-token"
 ```
 
-Notice that there is an "owner" *and* "repo" key here, while the CLI args only have a repo option. This is a left-over inconsistency caused from the earlier design expecting to get `"<owner>/<repo>"` together for use in the HTTP-API call. I'll fix it later.
-
 Some may apply to all projects. For this, one can use the special `[all]` table.
 
 ```toml
