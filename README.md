@@ -97,7 +97,6 @@ Since the more-specific settings are preferred, these can be combined to have an
 [all]
 gitea_url = "https://demo.gitea.com/"
 owner = "robert"
-# no `repo = ` section because that must be project specific.
 token = "fake-token"
 
 # Override Gitea target so I can test my uploads privately.
