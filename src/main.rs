@@ -12,8 +12,6 @@ use reqwest::header::ACCEPT;
 async fn main() -> Result<(), gt_tool::Error> {
     let args = Args::parse();
 
-    // TODO: Heuristics to guess project path
-    // See issue #8: https://git.gelvin.dev/robert/gt-tool/issues/8
     let project_path =
         args.project
             .map(PathBuf::from)
@@ -32,21 +30,17 @@ async fn main() -> Result<(), gt_tool::Error> {
         .gitea_url
         .or(config.gitea_url)
         .ok_or(gt_tool::Error::MissingGiteaUrl)?;
-    // Config files split the repo FQRN into "owner" and "repo" (confusing naming, sorry)
-    // These must be merged back together and passed along.
-    let conf_fqrn = config
-        .owner
-        .ok_or(gt_tool::Error::MissingRepoFRQN)
-        .and_then(|mut own| {
-            let repo = config.repo.ok_or(gt_tool::Error::MissingRepoFRQN)?;
-            own.push('/');
-            own.push_str(&repo);
-            Ok(own)
-        });
-    let repo_fqrn = args
-        .repo
-        .ok_or(gt_tool::Error::MissingRepoFRQN)
-        .or(conf_fqrn)?;
+
+    let owner = args.owner
+        .or(config.owner)
+        .ok_or(gt_tool::Error::MissingRepoOwner)?;
+
+    let repo = args.repo
+        .or(config.repo)
+        .or_else(infer_repo)
+        .ok_or(gt_tool::Error::MissingRepoName)?;
+
+    let repo_fqrn = String::from(format!("{owner}/{repo}"));
 
     let mut headers = reqwest::header::HeaderMap::new();
     headers.append(ACCEPT, header::HeaderValue::from_static("application/json"));
@@ -175,4 +169,11 @@ fn match_release_by_tag(tag: &String, releases: Vec<Release>) -> Option<Release>
         }
     }
     release
+}
+
+fn infer_repo() -> Option<String> {
+    let pwd = std::env::current_dir().ok()?;
+    let file_name = pwd.file_name()?;
+    let file_name_string = file_name.to_str()?;
+    Some(String::from(file_name_string))
 }

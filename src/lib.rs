@@ -23,6 +23,8 @@ pub enum Error {
     Placeholder,     // TODO: Enumerate error modes
     MissingGiteaUrl, // the gitea URL wasn't specified on the CLI, env, or config file.
     MissingRepoFRQN, // either the owner, repo, or both weren't specified in the loaded PartialConfig
+    MissingRepoOwner,
+    MissingRepoName,
     WrappedConfigErr(config::Error),
     WrappedReqwestErr(reqwest::Error),
     MissingAuthToken,
