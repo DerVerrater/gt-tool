@@ -34,7 +34,7 @@ async fn main() -> Result<(), gt_tool::Error> {
         .ok_or(gt_tool::Error::MissingRepoFRQN)
         .and_then(|mut own| {
             let repo = config.repo.ok_or(gt_tool::Error::MissingRepoFRQN)?;
-            own.push_str("/");
+            own.push('/');
             own.push_str(&repo);
             Ok(own)
         });
@@ -67,7 +67,7 @@ async fn main() -> Result<(), gt_tool::Error> {
                 releases.iter().rev().map(|release| release.colorized()),
                 String::from(""),
             )
-            .map(|release| println!("{}", release))
+            .map(|release| println!("{release}"))
             .fold((), |_, _| ());
         }
         gt_tool::cli::Commands::CreateRelease {

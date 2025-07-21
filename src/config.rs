@@ -110,15 +110,15 @@ pub fn get_config(
                 // 3b. or default, if the table couldn't be found.
                 .or(Ok(PartialConfig::default()))
                 // 4. assemble a 2-tuple of PartialConfigs by...
-                .and_then(|proj| {
-                    Ok((
+                .map(|proj| {
+                    (
                         // 4-1. Passing in the project-specific PartialConfig
                         proj.project_path(project),
                         // 4-2. Getting and converting to PartialConfig, or returning any Err() if one appears.
                         get_table(cfg_table, "all")
                             .and_then(PartialConfig::try_from)
                             .unwrap_or(PartialConfig::default()),
-                    ))
+                    )
                 })
                 .map(|pair| pair.0.merge(pair.1))
         })
