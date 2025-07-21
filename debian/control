@@ -10,8 +10,9 @@ Build-Depends:
  librust-colored-dev,
  librust-itertools-dev,
  librust-reqwest-dev,
- librust-tokio-dev,
  librust-serde-dev,
+ librust-tokio-dev,
+ librust-toml-dev,
 Homepage: https://git.gelvin.dev/robert/gt-tool
 Vcs-Git: https://git.gelvin.dev/robert/gt-tool
 Vcs-Browser: https://git.gelvin.dev/robert/gt-tool
