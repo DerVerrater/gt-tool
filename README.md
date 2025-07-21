@@ -15,8 +15,9 @@ Commands:
 
 Options:
   -u, --url <GITEA_URL>    [env: GTTOOL_GITEA_URL=]
-  -r, --repo <REPO>        [env: GTTOOL_FQRN=]
-  -p, --project <PROJECT>  Path to project (relative or absolute). Used to select configuration.
+  -o, --owner <OWNER>      [env: GTTOOL_OWNER=]
+  -r, --repo <REPO>        [env: GTTOOL_REPO=]
+  -p, --project <PROJECT>  Path to project (relative or absolute). Used to override configuration selection.
   -h, --help               Print help
   -V, --version            Print version
 ```
