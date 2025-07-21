@@ -22,6 +22,24 @@ Options:
   -V, --version            Print version
 ```
 
+### Required Information
+
+To function, this program requires knowledge of these items:
+
+- Gitea URL
+- Owner of repository
+- Repository name
+
+This info will be gathered from these locations, in order of priority:
+
+1. CLI argument
+2. Environment variable
+3. Configuration files
+
+It's worth noting that the "owner" is the entity that controls the repo on the Gitea instance. This will be the first part of the route in the URL: `http://demo.gitea.com/{owner}`.
+
+Likewise, the "repo" is what ever the Gitea instance thinks it's called -- which doesn't have to match anyone's local copy! It will be the second part of the route in the URL: `http://demo.gitea.com/{owner}/{repo}`.
+
 ### Authentication
 
 Authentication is token-based via environment variable `RELEASE_KEY_GITEA`.
