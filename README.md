@@ -55,7 +55,7 @@ For details, see Gitea's documentation on [token scopes](https://docs.gitea.com/
 
 ### The `--project` option
 
-Override the default (current-directory) project name when searching through the config files for this project's settings.
+Settings retrieved from config files are selected based on the project's path. By default, the current directory will be used. In case that guess is incorrect, this option can be specified with another path.
 
 See [configuration](#configuration) for details on format and file locations.
 
