@@ -31,16 +31,18 @@ async fn main() -> Result<(), gt_tool::Error> {
         .or(config.gitea_url)
         .ok_or(gt_tool::Error::MissingGiteaUrl)?;
 
-    let owner = args.owner
+    let owner = args
+        .owner
         .or(config.owner)
         .ok_or(gt_tool::Error::MissingRepoOwner)?;
 
-    let repo = args.repo
+    let repo = args
+        .repo
         .or(config.repo)
         .or_else(infer_repo)
         .ok_or(gt_tool::Error::MissingRepoName)?;
 
-    let repo_fqrn = String::from(format!("{owner}/{repo}"));
+    let repo_fqrn = format!("{owner}/{repo}");
 
     let mut headers = reqwest::header::HeaderMap::new();
     headers.append(ACCEPT, header::HeaderValue::from_static("application/json"));
