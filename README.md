@@ -58,3 +58,57 @@ One of these, defaults to `help`:
 | upload-release | Uploads one-or-more files to an existing release, identified by it's tag name. |
 | help | prints the help text (the usage summary above). |
 
+## Configuration
+
+Instead of specifying everything on the command line every single run, some TOML files can be used to persist project settings.
+
+> Exporting some environment variables would be similar, but that would be *more* annoying when working on multiple projects. One would have to constantly re-export the settings or use two shells. But then there's the issue of losing track of which shell has which settings.
+
+Settings are retrieved from a table named the same as the project's path on disk. For example, gt_tool itself could have an entry as follows:
+
+```toml
+["/home/robert/projects/gt-tool"]
+gitea_url = "https://demo.gitea.com/"
+owner = "dummy"
+repo = "gt-tool"
+token = "fake-token"
+```
+
+Notice that there is an "owner" *and* "repo" key here, while the CLI args only have a repo option. This is a left-over inconsistency caused from the earlier design expecting to get `"<owner>/<repo>"` together for use in the HTTP-API call. I'll fix it later.
+
+Some may apply to all projects. For this, one can use the special `[all]` table.
+
+```toml
+[all]
+gitea_url = "https://demo.gitea.com/"
+```
+
+Since the more-specific settings are preferred, these can be combined to have an override effect.
+
+```toml
+[all]
+gitea_url = "https://demo.gitea.com/"
+owner = "robert"
+# no `repo = ` section because that must be project specific.
+token = "fake-token"
+
+# Override Gitea target so I can test my uploads privately.
+["/home/robert/projects/gt-tool"]
+gitea_url = "http://localhost:3000"
+repo = "gt-tool"
+```
+
+Similar to how unspecified project settings will fall back to those in the "`[all]`" table, whole files will fall back to other, lower priority files. First, each dir in `$XDG_CONFIG_DIRS` is scanned for a `gt-tool.toml` file. Then, `/etc/gt-tool.toml`.
+
+> All config files **MUST** be named named `gt-tool.toml`.
+
+### Recognized Keys
+
+| Key | Description |
+|-|-|
+| gitea_url |  URL of the Gitea server. Same as `-u`, `--url`, and `$GTTOOL_GITEA_URL`. |
+| owner | Owner of the repository (individual, or organization). Combined with "repo" key to produce the fully-qualified-repo-name. Front-half of `-r`, `--repo`, and `$GTTOOL_FQRN` |
+| repo | Name of the repository on the Gitea server. Combined with "owner" key to produce the fully-qualified-repo-name. Back-half of `-r`, `--repo`, and `$GTTOOL_FQRN` |
+| token | Gitea auth token, exactly the same as `$RELEASE_KEY_GITEA` |
+
+Additional keys are quietly ignored. The config loading is done by querying a HashMap, so anything not touched doesn't get inspected. The only requirements are that the file is valid TOML, and that these keys are all strings.h
