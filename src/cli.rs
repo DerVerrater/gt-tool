@@ -5,7 +5,9 @@ use clap::{Parser, Subcommand};
 pub struct Args {
     #[arg(short = 'u', long = "url", env = "GTTOOL_GITEA_URL")]
     pub gitea_url: Option<String>,
-    #[arg(short = 'r', long = "repo", env = "GTTOOL_FQRN")]
+    #[arg(short = 'o', long = "owner", env = "GTTOOL_OWNER")]
+    pub owner: Option<String>,
+    #[arg(short = 'r', long = "repo", env = "GTTOOL_REPO")]
     pub repo: Option<String>,
     #[arg(
         short = 'p',
