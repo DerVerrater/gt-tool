@@ -84,7 +84,7 @@ repo = "gt-tool"
 token = "fake-token"
 ```
 
-Some may apply to all projects. For this, one can use the special `[all]` table.
+Sometimes one may want to apply a setting to all projects. For this, they can use the special `[all]` table.
 
 ```toml
 [all]
