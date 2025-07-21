@@ -5,7 +5,7 @@ CLI tools for interacting with the Gitea API. Use interactively to talk to your 
 ## Usage
 
 ```txt
-Usage: gt-tools --url <GITEA_URL> --repo <REPO> <COMMAND>
+Usage: gt-tool [OPTIONS] <COMMAND>
 
 Commands:
   list-releases   
@@ -14,10 +14,11 @@ Commands:
   help            Print this message or the help of the given subcommand(s)
 
 Options:
-  -u, --url <GITEA_URL>  [env: GTTOOL_GITEA_URL=]
-  -r, --repo <REPO>      [env: GTTOOL_FQRN=]
-  -h, --help             Print help
-  -V, --version          Print version
+  -u, --url <GITEA_URL>    [env: GTTOOL_GITEA_URL=]
+  -r, --repo <REPO>        [env: GTTOOL_FQRN=]
+  -p, --project <PROJECT>  Path to project (relative or absolute). Used to select configuration.
+  -h, --help               Print help
+  -V, --version            Print version
 ```
 
 ### Authentication
@@ -39,6 +40,12 @@ E.g.: Using the Gitea org's demo instance, it would be: `--url "https://demo.git
 The repository name must be provided with `--repo` or `-u` on the command line, or via the environment variable `GTTOOL_GITEA_FQRN` ("fully qualified repo name"). Use the format `<owner>/<repo>`, which is the route immediately following the GITEA_URL base. This is how GitHub and Gitea identify repos in the URL, and how Golang locates it's modules, so this tool does the same.
 
 E.g.: `--repo "go-gitea/gitea"` would name the Gitea repo belonging to the go-gitea organization.
+
+### `<PROJECT>`
+
+Override the default (current-directory) project name when searching through the config files for this project's settings.
+
+See [configuration](#configuration) for details on format and file locations.
 
 ### `<COMMAND>`:
 
