@@ -7,6 +7,12 @@ pub struct Args {
     pub gitea_url: Option<String>,
     #[arg(short = 'r', long = "repo", env = "GTTOOL_FQRN")]
     pub repo: Option<String>,
+    #[arg(
+        short = 'p',
+        long = "project",
+        help = "Path to project (relative or absolute). Used to select configuration."
+    )]
+    pub project: Option<String>,
 
     #[command(subcommand)]
     pub command: Commands,

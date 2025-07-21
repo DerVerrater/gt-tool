@@ -1,4 +1,4 @@
-use std::path;
+use std::path::{self, PathBuf};
 
 use gt_tool::cli::Args;
 use gt_tool::structs::release::{CreateReleaseOption, Release};
@@ -14,10 +14,15 @@ async fn main() -> Result<(), gt_tool::Error> {
 
     // TODO: Heuristics to guess project path
     // See issue #8: https://git.gelvin.dev/robert/gt-tool/issues/8
-    let pwd = std::env::current_dir()
-        .map_err(|_e| gt_tool::Error::WrappedConfigErr(gt_tool::config::Error::CouldntReadFile))?;
+    let project_path =
+        args.project
+            .map(PathBuf::from)
+            .unwrap_or(std::env::current_dir().map_err(|_e| {
+                gt_tool::Error::WrappedConfigErr(gt_tool::config::Error::CouldntReadFile)
+            })?);
     let config = gt_tool::config::get_config(
-        pwd.to_str()
+        project_path
+            .to_str()
             .expect("I assumed the path can be UTF-8, but that didn't work out..."),
         gt_tool::config::default_paths(),
     )?;
