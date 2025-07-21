@@ -53,15 +53,13 @@ Whether or not it is required depends on how your Gitea instance and the reposit
 
 For details, see Gitea's documentation on [token scopes](https://docs.gitea.com/development/oauth2-provider#scopes).
 
-### `<PROJECT>`
+### The `--project` option
 
 Override the default (current-directory) project name when searching through the config files for this project's settings.
 
 See [configuration](#configuration) for details on format and file locations.
 
-### `<COMMAND>`:
-
-One of these, defaults to `help`:
+### Commands:
 
 | Command | Description |
 |-|-|
