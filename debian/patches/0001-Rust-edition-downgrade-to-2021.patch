@@ -9,13 +9,13 @@ edition.
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Cargo.toml b/Cargo.toml
-index 4fd569c..8b67a52 100644
+index 39341a1..4ec2031 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
 @@ -1,7 +1,7 @@
  [package]
  name = "gt-tool"
- version = "2.2.0"
+ version = "3.0.0"
 -edition = "2024"
 +edition = "2021"
  
