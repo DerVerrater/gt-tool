@@ -4,9 +4,17 @@ use clap::{Parser, Subcommand};
 #[command(version, about, long_about = None)]
 pub struct Args {
     #[arg(short = 'u', long = "url", env = "GTTOOL_GITEA_URL")]
-    pub gitea_url: String,
-    #[arg(short = 'r', long = "repo", env = "GTTOOL_FQRN")]
-    pub repo: String,
+    pub gitea_url: Option<String>,
+    #[arg(short = 'o', long = "owner", env = "GTTOOL_OWNER")]
+    pub owner: Option<String>,
+    #[arg(short = 'r', long = "repo", env = "GTTOOL_REPO")]
+    pub repo: Option<String>,
+    #[arg(
+        short = 'p',
+        long = "project",
+        help = "Path to project (relative or absolute). Used to override configuration selection."
+    )]
+    pub project: Option<String>,
 
     #[command(subcommand)]
     pub command: Commands,

@@ -1,0 +1,15 @@
+[all]
+gitea_url = "http://localhost:3000"
+token = "fake-token"
+
+["/home/robert/projects/gt-tool"]
+owner = "robert"
+repo = "gt-tool"
+
+["/home/robert/projects/rcalc"]
+owner = "jamis"
+repo = "rcalc"
+
+["/home/robert/projects/rcalc-builders"]
+owner = "jamis"
+repo = "rcalc"

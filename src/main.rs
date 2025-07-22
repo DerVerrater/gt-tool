@@ -1,4 +1,4 @@
-use std::path;
+use std::path::{self, PathBuf};
 
 use gt_tool::cli::Args;
 use gt_tool::structs::release::{CreateReleaseOption, Release};
@@ -11,6 +11,38 @@ use reqwest::header::ACCEPT;
 #[tokio::main]
 async fn main() -> Result<(), gt_tool::Error> {
     let args = Args::parse();
+
+    let project_path =
+        args.project
+            .map(PathBuf::from)
+            .unwrap_or(std::env::current_dir().map_err(|_e| {
+                gt_tool::Error::WrappedConfigErr(gt_tool::config::Error::CouldntReadFile)
+            })?);
+    let config = gt_tool::config::get_config(
+        project_path
+            .to_str()
+            .expect("I assumed the path can be UTF-8, but that didn't work out..."),
+        gt_tool::config::default_paths(),
+    )?;
+    println!("->> Loaded Config: {config:?}");
+    // arg parser also checks the environment. Prefer CLI/env, then config file.
+    let gitea_url = args
+        .gitea_url
+        .or(config.gitea_url)
+        .ok_or(gt_tool::Error::MissingGiteaUrl)?;
+
+    let owner = args
+        .owner
+        .or(config.owner)
+        .ok_or(gt_tool::Error::MissingRepoOwner)?;
+
+    let repo = args
+        .repo
+        .or(config.repo)
+        .or_else(infer_repo)
+        .ok_or(gt_tool::Error::MissingRepoName)?;
+
+    let repo_fqrn = format!("{owner}/{repo}");
 
     let mut headers = reqwest::header::HeaderMap::new();
     headers.append(ACCEPT, header::HeaderValue::from_static("application/json"));
@@ -28,7 +60,7 @@ async fn main() -> Result<(), gt_tool::Error> {
     match args.command {
         gt_tool::cli::Commands::ListReleases => {
             let releases =
-                gt_tool::api::release::list_releases(&client, &args.gitea_url, &args.repo).await?;
+                gt_tool::api::release::list_releases(&client, &gitea_url, &repo_fqrn).await?;
             // Print in reverse order so the newest items are closest to the
             // user's command prompt. Otherwise the newest item scrolls off the
             // screen and can't be seen.
@@ -36,7 +68,7 @@ async fn main() -> Result<(), gt_tool::Error> {
                 releases.iter().rev().map(|release| release.colorized()),
                 String::from(""),
             )
-            .map(|release| println!("{}", release))
+            .map(|release| println!("{release}"))
             .fold((), |_, _| ());
         }
         gt_tool::cli::Commands::CreateRelease {
@@ -54,7 +86,7 @@ async fn main() -> Result<(), gt_tool::Error> {
                 tag_name,
                 target_commitish,
             };
-            gt_tool::api::release::create_release(&client, &args.gitea_url, &args.repo, submission)
+            gt_tool::api::release::create_release(&client, &gitea_url, &repo_fqrn, submission)
                 .await?;
         }
         gt_tool::cli::Commands::UploadRelease {
@@ -75,7 +107,7 @@ async fn main() -> Result<(), gt_tool::Error> {
             // Grab all, find the one that matches the input tag.
             // Scream if there are multiple matches.
             let release_candidates =
-                gt_tool::api::release::list_releases(&client, &args.gitea_url, &args.repo).await?;
+                gt_tool::api::release::list_releases(&client, &gitea_url, &repo_fqrn).await?;
 
             if let Some(release) = match_release_by_tag(&tag_name, release_candidates) {
                 for file in &files {
@@ -93,11 +125,7 @@ async fn main() -> Result<(), gt_tool::Error> {
                 }
                 for file in files {
                     let _attach_desc = gt_tool::api::release_attachment::create_release_attachment(
-                        &client,
-                        &args.gitea_url,
-                        &args.repo,
-                        release.id,
-                        file,
+                        &client, &gitea_url, &repo_fqrn, release.id, file,
                     )
                     .await?;
                 }
@@ -143,4 +171,11 @@ fn match_release_by_tag(tag: &String, releases: Vec<Release>) -> Option<Release>
         }
     }
     release
+}
+
+fn infer_repo() -> Option<String> {
+    let pwd = std::env::current_dir().ok()?;
+    let file_name = pwd.file_name()?;
+    let file_name_string = file_name.to_str()?;
+    Some(String::from(file_name_string))
 }
