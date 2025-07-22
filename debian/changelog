@@ -1,3 +1,69 @@
+gt-tool (3.0.0-1) unstable; urgency=medium
+
+  * Make the README title singular
+  * Add a Cargo.toml & Git tag version comparison
+  * Scaffold the new config module
+  * Add property-get utility function
+  * Add a get-table util function
+  * Util fn's can use anything that impl's ToString
+  * Util to get sometimes-empty config property
+  * Add partial- and whole- config structs
+  * Prototype load-config function
+  * Put the per-project test expects in for lconf()
+  * Finish `fn lconf()`. Project-specific vals load
+  * Create-and-assign struct to whole.all
+  * Use the get_table util to extract "[all]" table
+  * Extract PartCfg readers to a try_from impl
+  * Add a builder-pattern proj-path setter, for flavor
+  * Assert empty conf str is an error, TODO: semantics
+  * Rename the config-string-reading function
+  * Externalize the test table
+  * Remove some debug prints
+  * Signature & tests for fn load_from_file()
+  * Implement the load_from_file function
+  * "Merge" method on PartialConfig
+  * Complete the public `get_config()` function
+  * Pass in search files rather than generating them
+  * Make default search paths available as util fn
+  * Remove `WholeFile` struct & anything that uses it
+  * Autoformat
+  * Cargo clippy fixes
+  * Delete a now-solved FIXME comment
+  * Make the URL and Repo FQRN CLI args optional
+  * Wire in the conf file loading, assume PWD project
+  * Add more unit tests for the config loader
+  * Add test for skipping unavailable conf files
+  * Fix config unit tests: project path is set!
+  * Add docstring for PartialConfig::try_from()
+  * Fix: use empty PartialConfig if proj conf missing
+  * Fix: use default "[all]" if one isn't present
+  * Another autoformat
+  * Fix some clippy lints
+  * Mark pre-release 3.0.0-alpha.1
+  * Add a project path CLI option
+  * Update CLI usage guide, add project lookup guide
+  * Write configuration guide in the README
+  * Split the owner and repo args apart in CLI parser
+  * Use current-dir as final fallback repo name
+  * Drop notice about CLI not having "repo" & "owner"
+  * Revise help text for CLI "--project" arg
+  * Update usage printout
+  * Create a short, complete explanation of req. info.
+  * New 'authentication' section
+  * Delete the old CLI option sections
+  * Rename remaining CLI arg sections
+  * Revise explanation of `--project` option
+  * Drop the "no-repo" comment in TOML example
+  * Rephrase the all-projects setting introduction
+  * Mark the file-format and search-path conf sections
+  * Lint and format
+  * Bump crate version to v3.0.0
+  * Update automation workflow with new CLI args
+  * Add new upstream dependency to debian/control
+  * Rediff patches
+
+ -- Robert Garrett <robertgarrett404@gmail.com>  Tue, 22 Jul 2025 09:54:28 -0500
+
 gt-tool (2.2.0-2) unstable; urgency=medium
 
   * Fix: "Source:" URL in debian/copyright
