@@ -22,7 +22,9 @@ jobs:
       - name: Upload the program (using itself!)
         run: >
           target/release/gt-tool-${{ github.ref_name }}-$(arch)
-          -u ${{ vars.DEST_GITEA }} -r ${{ vars.DEST_REPO }}
+          -u ${{ vars.DEST_GITEA }}
+          -o ${{ vars.DEST_OWNER }}
+          -r ${{ vars.DEST_REPO }}
           upload-release
           "${{ github.ref_name }}"
           target/release/gt-tool-${{ github.ref_name }}-$(arch)
