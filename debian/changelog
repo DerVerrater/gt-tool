@@ -1,3 +1,14 @@
+gt-tool (3.0.1-1) unstable; urgency=medium
+
+  * Update dependency versions for Debian 13 "Trixie"
+  * Add metadata required for publishing to crates.io
+  * Remove the comments tracking Debian-specific deps
+  * Mark v3.0.1 patch
+  * Update gbp.conf debian-branch to "deb/trixie"
+  * Drop entirety of old patch set
+
+ -- Robert Garrett <robertgarrett404@gmail.com>  Thu, 13 Nov 2025 17:12:26 -0600
+
 gt-tool (3.0.0-1) unstable; urgency=medium
 
   * Make the README title singular
