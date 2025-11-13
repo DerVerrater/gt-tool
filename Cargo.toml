@@ -2,6 +2,11 @@
 name = "gt-tool"
 version = "3.0.0"
 edition = "2024"
+license = "GPL-3.0-only"
+description = "CLI tools for interacting with the Gitea API. Mainly for attaching files to releases."
+# homepage = "" I have no website for a project home page :(
+repository = "https://git.gelvin.dev/robert/gt-tool"
+readme = "README.md"
 
 [dependencies]
 clap = { version = "4.5.23", features = ["derive", "env"] }
