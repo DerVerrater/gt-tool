@@ -1,23 +1,18 @@
 [package]
 name = "gt-tool"
-version = "3.0.0"
+version = "3.0.1"
 edition = "2024"
+license = "GPL-3.0-only"
+description = "CLI tools for interacting with the Gitea API. Mainly for attaching files to releases."
+# homepage = "" I have no website for a project home page :(
+repository = "https://git.gelvin.dev/robert/gt-tool"
+readme = "README.md"
 
 [dependencies]
-clap = { version = "4.0.7", features = ["derive", "env"] }
-colored = "2.0.0"
-itertools = "0.10.0"
-reqwest = { version = "0.11.13", features = ["json", "stream", "multipart"] }
-serde = { version = "1.0.152", features = ["derive"] }
-tokio = { version = "1.24.2", features = ["macros", "rt-multi-thread"] }
-toml = "0.5"
-
-# Packages available in Debian (Sid)
-# clap = "4.5.23"
-# reqwest = "0.12.15"
-# tokio = "1.43.1"
-
-# Debian (Bookworm)
-# clap = "4.0.32"
-# reqwest = "0.11.13"
-# tokio = "1.24.2"
+clap = { version = "4.5.23", features = ["derive", "env"] }
+colored = "2.2.0"
+itertools = "0.13.0"
+reqwest = { version = "0.12.15", features = ["json", "stream", "multipart"] }
+serde = { version = "1.0.217", features = ["derive"] }
+tokio = { version = "1.43.1", features = ["macros", "rt-multi-thread"] }
+toml = "0.8.19"
