@@ -16,13 +16,3 @@ reqwest = { version = "0.12.15", features = ["json", "stream", "multipart"] }
 serde = { version = "1.0.217", features = ["derive"] }
 tokio = { version = "1.43.1", features = ["macros", "rt-multi-thread"] }
 toml = "0.8.19"
-
-# Packages available in Debian (Sid)
-# clap = "4.5.23"
-# reqwest = "0.12.15"
-# tokio = "1.43.1"
-
-# Debian (Bookworm)
-# clap = "4.0.32"
-# reqwest = "0.11.13"
-# tokio = "1.24.2"
