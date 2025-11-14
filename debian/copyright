@@ -11,19 +11,6 @@ Files: debian/*
 Copyright: 2025 Robert Garrett <robertgarrett404@gmail.com>
 License: GPL-3+
 
-Files: debian/rules
-Copyright:
- Johannes Schauer Marin Rodrigues <josch@debian.org>
- 2025 Robert Garrett <robertgarrett404@gmail.com>
-License: GPL-3+
-Comment:
- The debian/rules file is lifted directly from the tuigreet package. It was
- linked in the Debian Rust Team Book as a pretty simple example package. The
- only change I've made is to remove the documentation generation target.
- .
- https://salsa.debian.org/debian/tuigreet/-/blob/master/debian/rules?ref_type=heads
-
-
 License: GPL-3+
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
