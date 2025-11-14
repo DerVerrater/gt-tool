@@ -1,28 +1,83 @@
 Source: gt-tool
 Maintainer: Robert Garrett <robertgarrett404@gmail.com>
-Section: misc
+Section: rust
 Priority: optional
 Standards-Version: 4.6.2
 Build-Depends:
  debhelper-compat (= 13),
- dh-cargo,
- librust-clap-dev,
- librust-colored-dev,
- librust-itertools-dev,
- librust-reqwest-dev,
- librust-serde-dev,
- librust-tokio-dev,
- librust-toml-dev,
+ dh-sequence-cargo
+Build-Depends-Arch:
+ cargo:native,
+ rustc:native,
+ libstd-rust-dev,
+ librust-clap-4+default-dev (>= 4.5.23-~~),
+ librust-clap-4+derive-dev (>= 4.5.23-~~),
+ librust-clap-4+env-dev (>= 4.5.23-~~),
+ librust-colored-2+default-dev (>= 2.2.0-~~),
+ librust-itertools-0.13+default-dev,
+ librust-reqwest-0.12+default-dev (>= 0.12.15-~~),
+ librust-reqwest-0.12+json-dev (>= 0.12.15-~~),
+ librust-reqwest-0.12+multipart-dev (>= 0.12.15-~~),
+ librust-reqwest-0.12+stream-dev (>= 0.12.15-~~),
+ librust-serde-1+default-dev (>= 1.0.217-~~),
+ librust-serde-1+derive-dev (>= 1.0.217-~~),
+ librust-tokio-1+default-dev (>= 1.43.1-~~),
+ librust-tokio-1+macros-dev (>= 1.43.1-~~),
+ librust-tokio-1+rt-multi-thread-dev (>= 1.43.1-~~),
+ librust-toml-0.8+default-dev (>= 0.8.19-~~)
 Homepage: https://git.gelvin.dev/robert/gt-tool
 Vcs-Git: https://git.gelvin.dev/robert/gt-tool
 Vcs-Browser: https://git.gelvin.dev/robert/gt-tool
 Rules-Requires-Root: no
+X-Cargo-Crate: gt-tool
+
+Package: librust-gt-tool-dev
+Architecture: any
+Multi-Arch: same
+Depends:
+ ${misc:Depends},
+ librust-clap-4+default-dev (>= 4.5.23-~~),
+ librust-clap-4+derive-dev (>= 4.5.23-~~),
+ librust-clap-4+env-dev (>= 4.5.23-~~),
+ librust-colored-2+default-dev (>= 2.2.0-~~),
+ librust-itertools-0.13+default-dev,
+ librust-reqwest-0.12+default-dev (>= 0.12.15-~~),
+ librust-reqwest-0.12+json-dev (>= 0.12.15-~~),
+ librust-reqwest-0.12+multipart-dev (>= 0.12.15-~~),
+ librust-reqwest-0.12+stream-dev (>= 0.12.15-~~),
+ librust-serde-1+default-dev (>= 1.0.217-~~),
+ librust-serde-1+derive-dev (>= 1.0.217-~~),
+ librust-tokio-1+default-dev (>= 1.43.1-~~),
+ librust-tokio-1+macros-dev (>= 1.43.1-~~),
+ librust-tokio-1+rt-multi-thread-dev (>= 1.43.1-~~),
+ librust-toml-0.8+default-dev (>= 0.8.19-~~)
+Provides:
+ librust-gt-tool+default-dev (= ${binary:Version}),
+ librust-gt-tool-3-dev (= ${binary:Version}),
+ librust-gt-tool-3+default-dev (= ${binary:Version}),
+ librust-gt-tool-3.0-dev (= ${binary:Version}),
+ librust-gt-tool-3.0+default-dev (= ${binary:Version}),
+ librust-gt-tool-3.0.1-dev (= ${binary:Version}),
+ librust-gt-tool-3.0.1+default-dev (= ${binary:Version})
+Description: CLI tools for interacting with the Gitea API - Rust source code
+ Mainly for attaching files to releases.
+ .
+ Source code for Debianized Rust crate "gt-tool"
 
 Package: gt-tool
 Architecture: any
 Depends:
  ${misc:Depends},
  ${shlibs:Depends},
+ ${cargo:Depends}
+Recommends:
+ ${cargo:Recommends}
+Suggests:
+ ${cargo:Suggests}
+Provides:
+ ${cargo:Provides}
+Built-Using: ${cargo:Built-Using}
+Static-Built-Using: ${cargo:Static-Built-Using}
 Description: CLI tools for interacting with the Gitea API.
  Use interactively to talk to your Gitea instance, or automatically via a CI/CD
  pipeline. Currently supports:
