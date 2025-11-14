@@ -13,12 +13,3 @@ export DEB_CARGO_CRATE=$(DEB_SOURCE)_$(DEB_VERSION_UPSTREAM)
 
 %:
 	dh $@ --buildsystem=cargo
-
-execute_after_dh_auto_clean:
-	$(CARGO) clean
-	rm -rf $(CARGO_HOME)
-	rm -rf $(CARGO_REGISTRY)
-
-execute_before_dh_auto_configure:
-	$(CARGO) prepare-debian $(CARGO_REGISTRY) --link-from-system
-	rm -f Cargo.lock
