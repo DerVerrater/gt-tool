@@ -1,3 +1,15 @@
+gt-tool (3.0.1-2) unstable; urgency=medium
+
+  * Fix: debian/copyright was using old package name.
+  * Add a cargo-checksum.json, remove its fake
+  * Remove bogus pre-step inserts
+  * Strip out all the imports and exports
+  * Drop a copyright notice (!)
+  * Adopt debian/control contents from debcargo output
+  * Adopt debcargo auto-gen'd testing stuff
+
+ -- Robert Garrett <robertgarrett404@gmail.com>  Thu, 13 Nov 2025 22:07:35 -0600
+
 gt-tool (3.0.1-1) unstable; urgency=medium
 
   * Update dependency versions for Debian 13 "Trixie"
