@@ -1,5 +1,5 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: gt-tools
+Upstream-Name: gt-tool
 Upstream-Contact: Robert Garrett <robertgarrett404@gmail.com>
 Source: https://git.gelvin.dev/robert/gt-tool
 
